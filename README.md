@@ -2,7 +2,7 @@
 Generic API Project starting point
 
 Name | Stack | Microframework | Tests | Build Badge
--- | -- | -- | --
+-- | -- | -- | -- | --
 Omega Jazz | Ruby | Sinatra | Minitest | [![Build Status](https://travis-ci.org/ihsw/omega-jazz.svg?branch=master)](https://travis-ci.org/ihsw/omega-jazz)
 Pho Sho | PHP | Silex | phpunit | [![Build Status](https://travis-ci.org/ihsw/pho-sho.svg?branch=master)](https://travis-ci.org/ihsw/pho-sho)
 Go Home | Go | Gorilla Mux | stdlib | [![Build Status](https://travis-ci.org/ihsw/go-home.svg?branch=master)](https://travis-ci.org/ihsw/go-home)
