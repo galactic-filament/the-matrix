@@ -21,3 +21,9 @@ All projects should be considered permanently WIP while I continuously build up
 the RAML documentation that describes what each project should adhere to, as
 well as keeping up with the continuing evolution of web development in the above
 said stacks.
+
+## Why are you testing only microframeworks?
+
+Eventually I may move onto heavier frameworks (ie: Rails, Symfony, Django), but
+for now, in the interest of time, I have found it easier to get started with
+microframeworks.
