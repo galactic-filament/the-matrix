@@ -9,9 +9,8 @@ traits:
         pages:
           description: The number of pages to return
           type: number
-  - secured: !include http://remote-host/secured.yml
 /songs:
-  is: [ paged, secured ]
+  is: [ paged ]
   get:
     queryParameters:
       genre:
