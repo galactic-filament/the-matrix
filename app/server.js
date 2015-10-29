@@ -11,4 +11,15 @@ app.get('/', function (req, res) {
     res.send(err);
   });
 });
-app.listen(80);
+
+var server = app.listen(80, function () {
+  console.log('Listening on 80');
+});
+
+var exit = function () { server.close(function () {
+  console.log('Exiting');
+  process.exit(0);
+})};
+
+process.on('SIGTERM', exit);
+process.on('SIGINT', exit);
