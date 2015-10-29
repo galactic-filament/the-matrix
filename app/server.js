@@ -11,6 +11,13 @@ app.get('/', function (req, res) {
     res.send(err);
   });
 });
+app.get('/:file', function (req, res) {
+  raml2html.render('./' + req.params.file + '.raml', configWithDefaultTemplates).then(function (result) {
+    res.send(result);
+  }, function (err) {
+    res.send(err);
+  });
+});
 
 var server = app.listen(80, function () {
   console.log('Listening on 80');
