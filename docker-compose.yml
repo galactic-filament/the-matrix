@@ -1,0 +1,5 @@
+web:
+  image: ihsw/the-matrix
+  command: node server.js
+  ports:
+    - 80:80
