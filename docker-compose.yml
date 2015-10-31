@@ -3,3 +3,5 @@ web:
   command: node server.js
   ports:
     - 80:80
+  volumes:
+    - ./app:/srv/app
