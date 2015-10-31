@@ -8,5 +8,5 @@ describe 'home', ->
       .get '/'
       .end (err, res) ->
         expect(err).to.equal null
-        expect(res.body).to.equal 'Hello, world!'
+        expect(res.text).to.equal 'Hello, world!'
         done()
