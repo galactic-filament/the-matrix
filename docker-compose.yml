@@ -1,7 +1,18 @@
-web:
+test-suite:
   image: ihsw/the-matrix
-  command: node server.js
+  command: npm run test
+raml-viewer:
+  image: ihsw/the-matrix-raml-viewer
+  command: node index.js
+  ports:
+    - 80:80
+raml-viewer-dev:
+  image: ihsw/the-matrix-raml-viewer
+  command: node index.js
   ports:
     - 80:80
   volumes:
-    - ./app:/srv/app
+    - ./raml-viewer/app:/srv/app
+tests:
+  image: ihsw/the-matrix-tests
+  command: npm run test
