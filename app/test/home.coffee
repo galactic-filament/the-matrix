@@ -10,3 +10,10 @@ describe 'home', ->
         expect(err).to.equal null
         expect(res.text).to.equal 'Hello, world!'
         done()
+  it 'should respond to standard ping', (done) ->
+    request
+      .get '/ping'
+      .end (err, res) ->
+        expect(err).to.equal null
+        expect(res.text).to.equal 'Pong'
+        done()

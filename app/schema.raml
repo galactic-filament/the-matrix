@@ -1,17 +1,29 @@
 #%RAML 0.8
 
 title: Generic API
-baseUri: http://localhost/
+baseUri: http://ApiServer/
 /:
   displayName: Homepage
+  description: Dummy page that responds with static content
   get:
-    description: |
-      Just responds with 'Hello, world!'
+    description: Just responds with 'Hello, world!'
     responses:
       200:
         body:
-          application/json:
-            schema: |
-              {
-                "greeting": "Hello, world!"
-              }
+          text/html:
+            example: |
+              Hello, world!
+/ping:
+  displayName: Ping endpoint
+  description: |
+    Another dummy page that responds with static content.
+
+    Used for making sure the server handles different content on different URLs.
+  get:
+    description: Just responds with 'Pong'
+    responses:
+      200:
+        body:
+          text/html:
+            example: |
+              Pong
