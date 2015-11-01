@@ -9,7 +9,7 @@ render = (res, path) ->
   )
 app = express()
 app.get '/', (req, res) -> render res, './schema.raml'
-app.get '/:file', (req, res) -> render res, "./#{req.params.file}"
+app.get '/:file', (req, res) -> render res, "./#{req.params.file}.raml"
 
 server = app.listen 80, -> console.log 'Listening on 80'
 
