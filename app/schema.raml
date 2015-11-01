@@ -4,9 +4,8 @@ title: Generic API
 baseUri: http://ApiServer/
 /:
   displayName: Homepage
-  description: Dummy page that responds with static content
+  description: Should return standard greeting
   get:
-    description: Just responds with 'Hello, world!'
     responses:
       200:
         body:
@@ -15,12 +14,8 @@ baseUri: http://ApiServer/
               Hello, world!
 /ping:
   displayName: Ping endpoint
-  description: |
-    Another dummy page that responds with static content.
-
-    Used for making sure the server handles different content on different URLs.
+  description: Should respond to standard ping
   get:
-    description: Just responds with 'Pong'
     responses:
       200:
         body:
