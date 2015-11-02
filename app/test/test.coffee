@@ -3,13 +3,18 @@ exec = require('child_process').exec
 async = require 'async'
 assert = require 'assert'
 
-repos = ['omega-jazz']
+repos = [
+  'omega-jazz'
+  'pho-sho'
+  'go-home'
+  'py-lyfe'
+]
 
 # utility commands
 runCmd = (cmd, cb) -> exec cmd, (err, stdout, stderr) -> cb err
 repoCmd = (repoName, cmd, cb) ->
   exec "cd ./#{repoName} && #{cmd}", (err) -> cb err
-eachWithRepos = (repos, done, iterator) ->
+withRepos = (repos, done, iterator) ->
   async.each repos, iterator, (err) -> done err
 
 # derived commands
@@ -24,17 +29,17 @@ stopWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose stop web', cb
 
 describe 'Arithmetic', ->
   before (done) ->
-    eachWithRepos repos, done, (repoName, eachNext) ->
+    withRepos repos, done, (repoName, eachNext) ->
       tasks = [
         (seriesNext) -> cloneRepo repoName, (err) -> seriesNext err
         (seriesNext) -> buildRepo repoName, (err) -> seriesNext err
-        (seriesNext) -> upWeb repoName, (err) -> seriesNext err
+        # (seriesNext) -> upWeb repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
   after (done) ->
-    eachWithRepos repos, done, (repoName, eachNext) ->
+    withRepos repos, done, (repoName, eachNext) ->
       tasks = [
-        (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
+        # (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
         (seriesNext) -> deleteRepo repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
