@@ -1,6 +1,14 @@
 test-suite:
   image: ihsw/the-matrix
   command: npm run test
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+test-suite-dev:
+  image: ihsw/the-matrix
+  command: npm run test
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./app:/srv/app
 raml-viewer:
   image: ihsw/the-matrix-raml-viewer
   command: node index.js
