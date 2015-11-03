@@ -13,34 +13,45 @@ repos = [
 # utility commands
 runCmd = (cmd, cb) -> exec cmd, (err, stdout, stderr) -> cb err
 repoCmd = (repoName, cmd, cb) ->
-  exec "cd ./#{repoName} && #{cmd}", (err) -> cb err
+  exec "cd ./repos/#{repoName} && #{cmd}", (err) -> cb err
 withRepos = (repos, done, iterator) ->
   async.each repos, iterator, (err) -> done err
 
 # derived commands
 cloneRepo = (repoName, cb) ->
-  runCmd "git clone https://github.com/ihsw/#{repoName}.git", cb
-deleteRepo = (repoName, cb) -> runCmd "rm -rf ./#{repoName}", cb
+  runCmd(
+    "git clone https://github.com/ihsw/#{repoName}.git ./repos/#{repoName}"
+    cb
+  )
+deleteRepo = (repoName, cb) -> runCmd "rm -rf ./repos/#{repoName}", cb
 
 # derived repo commands
-buildRepo = (repoName, cb) -> repoCmd repoName, "./bin/build-images", cb
+buildImage = (repoName, cb) -> repoCmd repoName, "./bin/build-images", cb
 upWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose up -d web', cb
 stopWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose stop web', cb
 
-describe 'Arithmetic', ->
+describe 'Api Servers', ->
   before (done) ->
     withRepos repos, done, (repoName, eachNext) ->
       tasks = [
         (seriesNext) -> cloneRepo repoName, (err) -> seriesNext err
-        (seriesNext) -> buildRepo repoName, (err) -> seriesNext err
-        # (seriesNext) -> upWeb repoName, (err) -> seriesNext err
+        (seriesNext) -> buildImage repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
   after (done) ->
     withRepos repos, done, (repoName, eachNext) ->
       tasks = [
-        # (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
         (seriesNext) -> deleteRepo repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
-  it 'should add two numbers', -> expect(2+2).to.equal 4
+  it 'should run the test suite', (done) ->
+    async.eachSeries(
+      repos
+      (repoName, eachSeriesNext) ->
+        tasks = [
+          (seriesNext) -> upWeb repoName, (err) -> seriesNext err
+          (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
+        ]
+        async.series tasks, (err) -> eachSeriesNext err
+      (err) -> done err
+    )
