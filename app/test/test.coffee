@@ -50,5 +50,4 @@ describe 'Api Servers', ->
         (seriesNext) -> upWeb repoName, (err) -> seriesNext err
         (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
       ]
-      start = process.hrtime()
       async.series tasks, (err) -> eachNext err
