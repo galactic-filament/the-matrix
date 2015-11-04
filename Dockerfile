@@ -1,7 +1,5 @@
 FROM node
 
-EXPOSE 80
-
 # installing docker and docker-compose
 ENV DOCKER_COMPOSE_VERSION 1.4.2
 RUN curl -sSL https://get.docker.com/ubuntu/ | sh \
@@ -23,4 +21,4 @@ WORKDIR /srv/app
 RUN npm install -g mocha \
   && npm install
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "test"]

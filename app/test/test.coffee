@@ -27,8 +27,8 @@ deleteRepo = (repoName, cb) -> runCmd "rm -rf ./repos/#{repoName}", cb
 
 # derived repo commands
 buildImage = (repoName, cb) -> repoCmd repoName, "./bin/build-images", cb
-upWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose up -d web', cb
-stopWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose stop web', cb
+upWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose up -d base', cb
+stopWeb = (repoName, cb) -> repoCmd repoName, 'docker-compose stop base', cb
 
 describe 'Api Servers', ->
   before (done) ->
@@ -45,13 +45,10 @@ describe 'Api Servers', ->
       ]
       async.series tasks, (err) -> eachNext err
   it 'should run the test suite', (done) ->
-    async.eachSeries(
-      repos
-      (repoName, eachSeriesNext) ->
-        tasks = [
-          (seriesNext) -> upWeb repoName, (err) -> seriesNext err
-          (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
-        ]
-        async.series tasks, (err) -> eachSeriesNext err
-      (err) -> done err
-    )
+    withRepos repos, done, (repoName, eachNext) ->
+      tasks = [
+        (seriesNext) -> upWeb repoName, (err) -> seriesNext err
+        (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
+      ]
+      start = process.hrtime()
+      async.series tasks, (err) -> eachNext err

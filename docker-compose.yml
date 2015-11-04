@@ -1,26 +1,28 @@
-test-suite:
+base:
   image: ihsw/the-matrix
-  command: npm run test
+test-suite:
+  extends:
+    service: base
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
 test-suite-dev:
-  image: ihsw/the-matrix
-  command: npm run test
+  extends:
+    service: test-suite
   volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
     - ./app:/srv/app
-raml-viewer:
+
+base-raml-viewer:
   image: ihsw/the-matrix-raml-viewer
-  command: node index.js
+raml-viewer:
+  extends:
+    service: base-raml-viewer
   ports:
     - 80:80
 raml-viewer-dev:
-  image: ihsw/the-matrix-raml-viewer
-  command: node index.js
-  ports:
-    - 80:80
+  extends:
+    service: raml-viewer
   volumes:
     - ./raml-viewer/app:/srv/app
+
 tests:
   image: ihsw/the-matrix-tests
-  command: npm run test
