@@ -7,7 +7,8 @@ repos = [
   'omega-jazz'
   'pho-sho'
   'go-home'
-  'py-lyfe'
+  # 'py-lyfe'
+  # 'api-server'
 ]
 
 # utility commands
@@ -64,8 +65,7 @@ removeRepoContainer = (repoName, cb) ->
 runTests = (repoName, cb) ->
   getContainerId repoName, (err, containerId) ->
     return cb err if err
-    repoCmd(
-      repoName
+    runCmd(
       "docker run -t --link #{containerId}:ApiServer ihsw/the-matrix-tests"
       cb
     )
