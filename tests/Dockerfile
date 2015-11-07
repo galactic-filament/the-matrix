@@ -3,6 +3,7 @@ FROM node
 COPY ./app /srv/app
 WORKDIR /srv/app
 
-RUN npm install -g mocha
+RUN npm install -g mocha coffee-script \
+  && npm install
 
-CMD ["bash"]
+CMD ["npm", "run", "test"]
