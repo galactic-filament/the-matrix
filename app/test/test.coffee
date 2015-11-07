@@ -46,14 +46,6 @@ getContainerId = (repoName, cb) ->
   getFromRepoCmd repoName, "docker-compose ps -q base", (err, stdout, stderr) ->
     return cb err, null if err
     cb null, stdout.trim()
-runTests = (repoName, cb) ->
-  getContainerId repoName, (err, containerId) ->
-    return cb err if err
-    repoCmd(
-      repoName
-      "docker run -t --link #{containerId}:ApiServer ihsw/the-matrix-tests"
-      cb
-    )
 stopWeb = (repoName, cb) ->
   repoCmd repoName, 'docker-compose stop base', cb
 
@@ -69,6 +61,14 @@ removeRepoContainer = (repoName, cb) ->
   getContainerId repoName, (err, containerId) ->
     return cb err if err
     runCmd "docker rm -v #{containerId}", cb
+runTests = (repoName, cb) ->
+  getContainerId repoName, (err, containerId) ->
+    return cb err if err
+    repoCmd(
+      repoName
+      "docker run -t --link #{containerId}:ApiServer ihsw/the-matrix-tests"
+      cb
+    )
 
 describe 'Api Servers', ->
   before (done) ->
