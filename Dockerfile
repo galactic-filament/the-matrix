@@ -18,7 +18,6 @@ COPY ./app /srv/app
 WORKDIR /srv/app
 
 # installing nodejs assets
-RUN npm install -g mocha \
-  && npm install
+RUN npm install
 
-CMD ["npm", "run", "test"]
+CMD ["npm", "test"]
