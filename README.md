@@ -1,4 +1,6 @@
 # the-matrix
+[![Build Status](https://travis-ci.org/ihsw/the-matrix.svg?branch=master)](https://travis-ci.org/ihsw/the-matrix)
+
 ## What is The Matrix?
 This is a listing of projects I am writing in various web frameworks.
 
