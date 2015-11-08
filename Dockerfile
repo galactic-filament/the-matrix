@@ -20,4 +20,5 @@ WORKDIR /srv/app
 # installing nodejs assets
 RUN npm install
 
+
 CMD ["npm", "test"]
