@@ -7,7 +7,7 @@ repos = [
   'omega-jazz'
   'pho-sho'
   'go-home'
-  # 'py-lyfe'
+  'py-lyfe'
   # 'api-server'
 ]
 
