@@ -8,7 +8,7 @@ repos = [
   'pho-sho'
   'go-home'
   'py-lyfe'
-  # 'api-server'
+  'api-server'
 ]
 
 # utility commands
@@ -16,15 +16,12 @@ runCmd = (cmd, cb) ->
   exec cmd, (err, stdout, stderr) ->
     cb err
 getFromCmd = (cmd, cb) ->
-  exec cmd, (err, stdout, stderr) ->
-    return cb err, null if err
-    cb null, stdout, stderr
+  exec cmd, cb
 repoCmd = (repoName, cmd, cb) ->
   runCmd "cd ./repos/#{repoName} && #{cmd}", (err) ->
     cb err
 getFromRepoCmd = (repoName, cmd, cb) ->
-  getFromCmd "cd ./repos/#{repoName} && #{cmd}", (err, stdout, stderr) ->
-    cb err, stdout, stderr
+  getFromCmd "cd ./repos/#{repoName} && #{cmd}", cb
 withRepos = (repos, done, iterator) ->
   async.each repos, iterator, (err) ->
     done err
@@ -42,13 +39,17 @@ deleteRepo = (repoName, cb) ->
 buildImage = (repoName, cb) ->
   repoCmd repoName, "./bin/build-images", cb
 upWeb = (repoName, cb) ->
-  repoCmd repoName, 'docker-compose up -d base', cb
+  repoCmd repoName, 'docker-compose up -d web-test', cb
 getContainerId = (repoName, cb) ->
-  getFromRepoCmd repoName, "docker-compose ps -q base", (err, stdout, stderr) ->
-    return cb err, null if err
-    cb null, stdout.trim()
+  getFromRepoCmd(
+    repoName
+    "docker-compose ps -q web-test"
+    (err, stdout, stderr) ->
+      return cb err, null if err
+      cb null, stdout.trim()
+  )
 stopWeb = (repoName, cb) ->
-  repoCmd repoName, 'docker-compose stop base', cb
+  repoCmd repoName, 'docker-compose stop web-test', cb
 
 # derived container commands
 isRepoUp = (repoName, cb) ->
@@ -65,7 +66,7 @@ removeRepoContainer = (repoName, cb) ->
 runTests = (repoName, cb) ->
   getContainerId repoName, (err, containerId) ->
     return cb err if err
-    runCmd(
+    getFromCmd(
       "docker run -t --link #{containerId}:ApiServer ihsw/the-matrix-tests"
       cb
     )
@@ -85,7 +86,7 @@ describe 'Api Servers', ->
           isRepoUp repoName, (err, isUp) ->
             return seriesNext null if !isUp
             stopWeb repoName, (err) -> seriesNext err
-        (seriesNext) -> removeRepoContainer repoName, (err) -> seriesNext err
+        # (seriesNext) -> removeRepoContainer repoName, (err) -> seriesNext err
         (seriesNext) -> deleteRepo repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
@@ -96,7 +97,9 @@ describe 'Api Servers', ->
         (seriesNext) ->
           isRepoUp repoName, (err, isUp) ->
             return seriesNext new Error "repo #{repoName} is not up" if !isUp
-            runTests repoName, (err) -> seriesNext err
+            runTests repoName, (err, stdout, stderr) ->
+              expect(err).to.equal null, "Could not run tests for #{repoName}"
+              seriesNext null
         (seriesNext) -> stopWeb repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
