@@ -63,11 +63,16 @@ removeRepoContainer = (repoName, cb) ->
   getContainerId repoName, (err, containerId) ->
     return cb err if err
     runCmd "docker rm -v #{containerId}", cb
+removeTestContainer = (repoName, cb) ->
+  runCmd "docker rm -v #{repoName}_test", cb
 runTests = (repoName, cb) ->
   getContainerId repoName, (err, containerId) ->
     return cb err if err
+
+    link = "#{containerId}:ApiServer"
+    name = "#{repoName}_test"
     getFromCmd(
-      "docker run -t --link #{containerId}:ApiServer ihsw/the-matrix-tests"
+      "docker run -t --link #{link} --name #{name} ihsw/the-matrix-tests"
       cb
     )
 
@@ -87,6 +92,7 @@ describe 'Api Servers', ->
             return seriesNext null if !isUp
             stopWeb repoName, (err) -> seriesNext err
         (seriesNext) -> removeRepoContainer repoName, (err) -> seriesNext err
+        (seriesNext) -> removeTestContainer repoName, (err) -> seriesNext err
         (seriesNext) -> deleteRepo repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
