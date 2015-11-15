@@ -86,7 +86,7 @@ describe 'Api Servers', ->
           isRepoUp repoName, (err, isUp) ->
             return seriesNext null if !isUp
             stopWeb repoName, (err) -> seriesNext err
-        # (seriesNext) -> removeRepoContainer repoName, (err) -> seriesNext err
+        (seriesNext) -> removeRepoContainer repoName, (err) -> seriesNext err
         (seriesNext) -> deleteRepo repoName, (err) -> seriesNext err
       ]
       async.series tasks, (err) -> eachNext err
