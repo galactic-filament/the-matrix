@@ -22,3 +22,17 @@ baseUri: http://ApiServer/
           text/html:
             example: |
               Pong
+/reflection:
+  displayName: Json reflection
+  description: Returns identical Json in response as provided by request
+  post:
+    body:
+      application/json:
+        schema: |
+          { "greeting": "Hello, world!" }
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              { "greeting": "Hello, world!" }
