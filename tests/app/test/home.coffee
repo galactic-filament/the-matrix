@@ -18,3 +18,16 @@ describe 'Ping endpoint', ->
         expect(err).to.equal null
         expect(res.text).to.equal 'Pong'
         done()
+describe 'Json reflection', ->
+  it(
+    'Should return identical Json in response as provided by request'
+    (done) ->
+      body = { greeting: 'Hello, world!' }
+      request
+        .post '/reflection'
+        .send body
+        .end (err, res) ->
+          expect(err).to.equal null
+          expect(res.body.greeting).to.equal body.greeting
+          done()
+  )
