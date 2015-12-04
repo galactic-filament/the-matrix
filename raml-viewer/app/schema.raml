@@ -36,3 +36,17 @@ baseUri: http://ApiServer/
           application/json:
             schema: |
               { "greeting": "Hello, world!" }
+/posts:
+  displayName: Post creation endpoint
+  description: Should return the new post's id
+  post:
+    body:
+      application/json:
+        schema: |
+          { "body": "Hello, world!" }
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              { "id": 1 }
