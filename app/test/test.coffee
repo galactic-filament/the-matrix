@@ -8,7 +8,7 @@ repos = [
   'pho-sho'
   'go-home'
   'py-lyfe'
-  'api-server'
+  'es-bueno'
 ]
 
 # utility commands
