@@ -9,11 +9,7 @@ func runTasks(workerCount int, in chan repo) chan repoTask {
 	out := make(chan repoTask)
 	worker := func() {
 		for repo := range in {
-			task := repoTask{
-				repo: repo,
-				err:  repo.runTests(),
-			}
-			out <- task
+			out <- repoTask{repo: repo, err: repo.runTests()}
 		}
 	}
 	postWork := func() { close(out) }

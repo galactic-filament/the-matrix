@@ -27,8 +27,7 @@ func TestTestSuite(t *testing.T) {
 	// starting it up
 	go func() {
 		for _, repoName := range repoNames {
-			repo := repo{manager: repoManager, name: repoName}
-			reposToDo <- repo
+			reposToDo <- repo{manager: repoManager, name: repoName}
 		}
 		close(reposToDo)
 	}()

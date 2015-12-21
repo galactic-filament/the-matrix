@@ -7,8 +7,7 @@ import (
 )
 
 func runCommand(name string) error {
-	cmd := exec.Command("sh", "-c", name)
-	return cmd.Run()
+	return exec.Command("sh", "-c", name).Run()
 }
 
 func work(workerCount int, worker func(), postWork func()) {

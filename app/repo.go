@@ -35,12 +35,19 @@ func (r repo) runTests() error {
 		fmt.Sprintf("https://github.com/ihsw/%s.git", r.name),
 		r.clonePath(),
 	)
-	if err := runCommand(cloneCommand); err != nil {
+	if err := r.runCommand(cloneCommand); err != nil {
+		return err
+	}
+
+	return r.cleanup()
+}
+
+func (r repo) runCommand(name string) error {
+	if err := runCommand(name); err != nil {
 		if err := r.cleanup(); err != nil {
 			return err
 		}
 		return err
 	}
-
-	return r.cleanup()
+	return nil
 }
