@@ -1,10 +1,10 @@
 FROM golang
 
-# # installing docker and docker-compose
-# ENV DOCKER_COMPOSE_VERSION 1.4.2
-# RUN curl -sSL https://get.docker.com/ | sh \
-#   && curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose \
-#   && chmod +x /usr/local/bin/docker-compose
+# installing docker and docker-compose
+ENV DOCKER_COMPOSE_VERSION 1.4.2
+RUN curl -sSL https://get.docker.com/ | sh \
+  && curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose \
+  && chmod +x /usr/local/bin/docker-compose
 
 # adding github to known_hosts
 ENV KNOWN_HOSTS_PATH /root/.ssh/known_hosts

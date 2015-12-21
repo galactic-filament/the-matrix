@@ -1,8 +1,10 @@
-sudo: false
+sudo: required
 language: go
 go:
   - 1.5
   - tip
+services:
+  - docker
 
 before_script:
   - go vet github.com/ihsw/the-matrix/app/...

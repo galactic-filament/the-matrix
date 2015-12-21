@@ -39,7 +39,15 @@ func (r repo) runTests() error {
 		return err
 	}
 
+	if err := r.runRepoCommand("./bin/build-images"); err != nil {
+		return err
+	}
+
 	return r.cleanup()
+}
+
+func (r repo) runRepoCommand(name string) error {
+	return r.runCommand(fmt.Sprintf("cd %s && %s", r.clonePath(), name))
 }
 
 func (r repo) runCommand(name string) error {
