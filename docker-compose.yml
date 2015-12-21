@@ -1,15 +1,17 @@
-base:
+test-suite-base:
   image: ihsw/the-matrix
+  command: go test github.com/ihsw/the-matrix/app/...
 test-suite:
   extends:
-    service: base
+    service: test-suite-base
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
 test-suite-dev:
   extends:
-    service: test-suite
+    service: test-suite-base
   volumes:
-    - ./app:/srv/app
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./app:/go/src/github.com/ihsw/the-matrix/app
 
 base-raml-viewer:
   image: ihsw/the-matrix-raml-viewer

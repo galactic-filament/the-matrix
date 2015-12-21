@@ -1,10 +1,10 @@
-sudo: required
-language: node_js
-node_js:
-  - 4.1
-services:
-  - docker
+sudo: false
+language: go
+go:
+  - 1.5
+  - tip
 
-before_install:
-  - ./bin/build-images
-  - cd ./app
+before_script:
+  - go vet github.com/ihsw/the-matrix/app/...
+script:
+  - go test github.com/ihsw/the-matrix/app/...
