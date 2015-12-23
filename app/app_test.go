@@ -14,10 +14,10 @@ func TestTestSuite(t *testing.T) {
 	repoManager := repoManager{cloneDestination: "./repos"}
 	repoNames := []string{
 		"omega-jazz",
-		"pho-sho",
-		"go-home",
-		"py-lyfe",
-		"es-bueno",
+		// "pho-sho",
+		// "go-home",
+		// "py-lyfe",
+		// "es-bueno",
 	}
 
 	// spinning up some workers
