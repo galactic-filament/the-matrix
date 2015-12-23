@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"os"
 )
 
@@ -41,6 +42,7 @@ func (r repo) runRepoCommand(name string) error {
 
 func (r repo) runTests() error {
 	// cloning the repo in
+	log.WithFields(log.Fields{"repo": r.name}).Info("Cloning")
 	cloneCommand := fmt.Sprintf(
 		"git clone %s %s",
 		fmt.Sprintf("https://github.com/ihsw/%s.git", r.name),
@@ -51,11 +53,13 @@ func (r repo) runTests() error {
 	}
 
 	// building up the related images
+	log.WithFields(log.Fields{"repo": r.name}).Info("Building images")
 	if err := r.runRepoCommand("./bin/build-images"); err != nil {
 		return err
 	}
 
 	// starting up the web-test service
+	log.WithFields(log.Fields{"repo": r.name}).Info("Up web-test")
 	if err := r.runRepoCommand("docker-compose up -d web-test"); err != nil {
 		return err
 	}
@@ -69,16 +73,19 @@ func (r repo) cleanup() error {
 	// TODO: clean up the test container
 
 	// stopping the services
+	log.WithFields(log.Fields{"repo": r.name}).Info("Stop all")
 	if err := r.runRepoCommand("docker-compose stop"); err != nil {
 		return err
 	}
 
 	// cleaning up the web-test service containers
+	log.WithFields(log.Fields{"repo": r.name}).Info("Remove containers")
 	if err := r.runRepoCommand("docker rm -v $(docker-compose ps -q)"); err != nil {
 		return err
 	}
 
 	// removing the cloned repo
+	log.WithFields(log.Fields{"repo": r.name}).Info("Remove repo files")
 	if err := os.RemoveAll(r.clonePath()); err != nil {
 		return err
 	}

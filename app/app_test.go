@@ -1,6 +1,7 @@
 package main
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -45,6 +46,7 @@ func TestTestSuite(t *testing.T) {
 		}
 	}
 
+	log.Info("Manager cleanup")
 	if err := repoManager.cleanup(); err != nil {
 		fail(t, err)
 	}
