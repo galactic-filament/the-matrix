@@ -6,8 +6,8 @@ import (
 	"sync"
 )
 
-func runCommand(name string) error {
-	return exec.Command("sh", "-c", name).Run()
+func runCommand(name string) ([]byte, error) {
+	return exec.Command("sh", "-c", name).Output()
 }
 
 func work(workerCount int, worker func(), postWork func()) {
