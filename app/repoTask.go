@@ -5,7 +5,7 @@ type repoTask struct {
 	err  error
 }
 
-func runTasks(workerCount int, in chan repo) chan repoTask {
+func runTasks(in chan repo) chan repoTask {
 	out := make(chan repoTask)
 	worker := func() {
 		for repo := range in {
@@ -13,7 +13,7 @@ func runTasks(workerCount int, in chan repo) chan repoTask {
 		}
 	}
 	postWork := func() { close(out) }
-	work(workerCount, worker, postWork)
+	work(2, worker, postWork)
 
 	return out
 }

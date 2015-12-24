@@ -23,7 +23,7 @@ func TestTestSuite(t *testing.T) {
 
 	// spinning up some workers
 	reposToDo := make(chan repo)
-	reposFinished := runTasks(2, reposToDo)
+	reposFinished := runTasks(reposToDo)
 
 	// starting it up
 	go func() {
