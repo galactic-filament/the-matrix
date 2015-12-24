@@ -7,5 +7,6 @@ services:
 
 before_script:
   - go vet github.com/ihsw/the-matrix/app/...
+  - ./bin/build-images
 script:
   - go test -v github.com/ihsw/the-matrix/app/...
