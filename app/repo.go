@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
@@ -15,6 +16,7 @@ type repoManager struct {
 }
 
 func (r repoManager) cleanup() error {
+	log.Info("Manager cleanup")
 	return os.RemoveAll(r.cloneDestination)
 }
 
@@ -24,6 +26,7 @@ type repo struct {
 	name          string
 	testContainer *docker.Container
 	client        *docker.Client
+	testFailed    bool
 }
 
 func (r repo) clonePath() string {
@@ -32,7 +35,7 @@ func (r repo) clonePath() string {
 
 func (r repo) runCommand(name string) (output []byte, err error) {
 	if output, err = runCommand(name); err != nil {
-		if err := r.cleanup(); err != nil {
+		if err := r.cleanup(err); err != nil {
 			return nil, err
 		}
 		return nil, err
@@ -66,21 +69,21 @@ func (r repo) runTests() (err error) {
 	)
 	if _, err = r.runCommand(cloneCommand); err != nil {
 		r.logWarning("Could not clone")
-		return err
+		return r.cleanup(err)
 	}
 
 	// building up the related images
 	r.logInfo("Building images")
 	if _, err = r.runRepoCommand("./bin/build-images"); err != nil {
 		r.logWarning("Could not build images")
-		return err
+		return r.cleanup(err)
 	}
 
 	// starting up the web-test service
 	r.logInfo("Up web-test")
 	if _, err = r.runRepoCommand("docker-compose up -d web-test"); err != nil {
 		r.logWarning("Could not up web-tests")
-		return err
+		return r.cleanup(err)
 	}
 
 	// fetching the name web-test container
@@ -89,18 +92,19 @@ func (r repo) runTests() (err error) {
 	output, err = r.runRepoCommand("docker-compose ps -q web-test")
 	if err != nil {
 		r.logWarning("Could not fetch web-test container name")
-		return err
+		return r.cleanup(err)
 	}
 	webTestContainerName := strings.TrimSpace(string(output))
 
 	// creating the test container
 	r.logInfo("Create test container")
 	r.testContainer, err = r.client.CreateContainer(docker.CreateContainerOptions{
+		Name:   fmt.Sprintf("%s-tests", r.name),
 		Config: &docker.Config{Image: "ihsw/the-matrix-tests"},
 	})
 	if err != nil {
 		r.logWarning(fmt.Sprintf("Could not create test container: %s", err.Error()))
-		return err
+		return r.cleanup(err)
 	}
 
 	// starting the test container against the web-test container
@@ -109,29 +113,36 @@ func (r repo) runTests() (err error) {
 		Links: []string{fmt.Sprintf("%s:ApiServer", webTestContainerName)},
 	})
 	if err != nil {
-		return err
+		return r.cleanup(err)
 	}
 
-	// waiting for the test container to exit
+	// waiting for the test container to exit and checking the exit code
 	r.logInfo("Waiting for the test container to exit")
-	if _, err = r.client.WaitContainer(r.testContainer.ID); err != nil {
-		return err
+	var status int
+	if status, err = r.client.WaitContainer(r.testContainer.ID); err != nil {
+		return r.cleanup(err)
+	}
+	if r.testFailed = status != 0; r.testFailed == true {
+		r.logWarning("Test container exited with non-zero status")
+		return r.cleanup(errors.New("Test container exited with non-zero status"))
 	}
 
-	return r.cleanup()
+	return r.cleanup(nil)
 }
 
-func (r repo) cleanup() (err error) {
+func (r repo) cleanup(prevErr error) (err error) {
 	r.logInfo("Cleaning up")
 
 	// cleaning up the test container
-	r.logInfo("Removing test container")
-	err = r.client.RemoveContainer(docker.RemoveContainerOptions{
-		ID:            r.testContainer.ID,
-		RemoveVolumes: true,
-	})
-	if err != nil {
-		return err
+	if r.testContainer != nil && r.testFailed == false {
+		r.logInfo("Removing test container")
+		err = r.client.RemoveContainer(docker.RemoveContainerOptions{
+			ID:            r.testContainer.ID,
+			RemoveVolumes: true,
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	// stopping the services
@@ -142,10 +153,12 @@ func (r repo) cleanup() (err error) {
 	}
 
 	// cleaning up the web-test service containers
-	r.logInfo("Remove containers")
-	if _, err = r.runRepoCommand("docker rm -v $(docker-compose ps -q)"); err != nil {
-		r.logInfo("Could not remove containers")
-		return err
+	if r.testFailed == false {
+		r.logInfo("Remove containers")
+		if _, err = r.runRepoCommand("docker rm -v $(docker-compose ps -q)"); err != nil {
+			r.logInfo("Could not remove containers")
+			return err
+		}
 	}
 
 	// removing the cloned repo
@@ -155,5 +168,5 @@ func (r repo) cleanup() (err error) {
 		return err
 	}
 
-	return nil
+	return prevErr
 }

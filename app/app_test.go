@@ -11,6 +11,10 @@ func fail(t *testing.T, err error) {
 	assert.Equal(t, err.Error(), nil)
 }
 
+func init() {
+	log.SetLevel(log.WarnLevel)
+}
+
 func TestTestSuite(t *testing.T) {
 	// misc
 	repoManager := repoManager{cloneDestination: "./repos"}
@@ -42,20 +46,10 @@ func TestTestSuite(t *testing.T) {
 	// waiting for it to drain out
 	for task := range reposFinished {
 		if err := task.err; err != nil {
-			if err := task.repo.cleanup(); err != nil {
-				fail(t, err)
-				return
-			}
-			if err := repoManager.cleanup(); err != nil {
-				fail(t, err)
-				return
-			}
 			fail(t, err)
-			return
 		}
 	}
 
-	log.Info("Manager cleanup")
 	if err := repoManager.cleanup(); err != nil {
 		fail(t, err)
 		return
