@@ -18,7 +18,7 @@ func runTasks(in chan repo, client *docker.Client) chan repoTask {
 		}
 	}
 	postWork := func() { close(out) }
-	work(2, worker, postWork)
+	work(4, worker, postWork)
 
 	return out
 }
