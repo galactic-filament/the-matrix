@@ -31,3 +31,12 @@ describe 'Json reflection', ->
           expect(res.body.greeting).to.equal body.greeting
           done()
   )
+describe 'Post creation endpoint', ->
+  it "Should return the new post's id", (done) ->
+    request
+      .post '/posts'
+      .send { body: 'Hello, world!' }
+      .end (err, res) ->
+        expect(err).to.equal null
+        expect(typeof res.body.id).to.equal 'number'
+        done()
