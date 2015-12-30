@@ -7,6 +7,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 	"os"
 	"strings"
+	"time"
 )
 
 // repo manager
@@ -33,18 +34,8 @@ func (r repo) clonePath() string {
 	return fmt.Sprintf("%s/%s", r.manager.cloneDestination, r.name)
 }
 
-func (r repo) runCommand(name string) (output []byte, err error) {
-	if output, err = runCommand(name); err != nil {
-		if err := r.cleanup(err); err != nil {
-			return nil, err
-		}
-		return nil, err
-	}
-	return output, nil
-}
-
 func (r repo) runRepoCommand(name string) ([]byte, error) {
-	return r.runCommand(fmt.Sprintf("cd %s && %s", r.clonePath(), name))
+	return runCommand(fmt.Sprintf("cd %s && %s", r.clonePath(), name))
 }
 
 func (r repo) log() *log.Entry {
@@ -67,7 +58,7 @@ func (r repo) runTests() (err error) {
 		fmt.Sprintf("https://github.com/ihsw/%s.git", r.name),
 		r.clonePath(),
 	)
-	if _, err = r.runCommand(cloneCommand); err != nil {
+	if _, err = runCommand(cloneCommand); err != nil {
 		r.logWarning("Could not clone")
 		return r.cleanup(err)
 	}
@@ -85,6 +76,9 @@ func (r repo) runTests() (err error) {
 		r.logWarning("Could not up web-tests")
 		return r.cleanup(err)
 	}
+
+	// sleep so that the web-test container has time to get up
+	time.Sleep(10 * time.Second)
 
 	// fetching the name web-test container
 	r.logInfo("Fetch web-test container name")
