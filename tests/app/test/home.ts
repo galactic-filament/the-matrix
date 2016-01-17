@@ -5,7 +5,7 @@ import chai = require("chai");
 let expect = chai.expect;
 let request = supertest("http://ApiServer");
 describe("Homepage", () => {
-    it("Should return standard greeting", (done) => {
+    it("Should return standard greeting", (done: MochaDone) => {
       request
         .get("/")
         .end((err: Error, res: supertest.Response) => {
@@ -17,7 +17,7 @@ describe("Homepage", () => {
     });
 });
 describe("Ping endpoint", () => {
-  it("Should respond to standard ping", (done) => {
+  it("Should respond to standard ping", (done: MochaDone) => {
     request
       .get("/ping")
       .end((err: Error, res: supertest.Response) => {
@@ -29,9 +29,7 @@ describe("Ping endpoint", () => {
   });
 });
 describe("Json reflection", () => {
-  it(
-    "Should return identical Json in response as provided by request",
-    (done) => {
+  it("Should return identical Json in response as provided by request", (done: MochaDone) => {
       let body = { greeting: "Hello, world!" };
       request
         .post("/reflection")
@@ -45,7 +43,7 @@ describe("Json reflection", () => {
   });
 });
 describe("Post creation endpoint", () => {
-  it("Should return the new post's id", (done) => {
+  it("Should return the new post's id", (done: MochaDone) => {
     request
       .post("/posts")
       .send({ body: "Hello, world!" })
