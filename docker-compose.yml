@@ -25,6 +25,3 @@ raml-viewer-dev:
     service: raml-viewer
   volumes:
     - ./raml-viewer/app:/srv/app
-
-tests:
-  image: ihsw/the-matrix-tests

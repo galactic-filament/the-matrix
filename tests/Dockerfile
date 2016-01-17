@@ -6,7 +6,10 @@ RUN apt-get update -q \
 COPY ./app /srv/app
 WORKDIR /srv/app
 
-RUN npm install -g --silent mocha coffee-script \
-  && npm install --silent
+RUN npm install -g --silent mocha tsd \
+  && tsd -V \
+  && mocha -V \
+  && npm install --silent \
+  && tsd install
 
 CMD ["./bin/run-tests"]
