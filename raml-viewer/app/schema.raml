@@ -50,3 +50,15 @@ baseUri: http://ApiServer/
           application/json:
             schema: |
               { "id": 1 }
+/post/{id}:
+  displayName: Post endpoint
+  get:
+    description: Should return a post
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              { "id": 1, "body": "Hello, world!" }
+  delete:
+    description: Should delete a post
