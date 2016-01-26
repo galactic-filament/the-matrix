@@ -44,7 +44,13 @@ func TestTestSuite(t *testing.T) {
 	}()
 
 	// waiting for it to drain out
+	tasksFinished := make([]repoTask, len(repoNames))
 	for task := range reposFinished {
+		tasksFinished = append(tasksFinished, task)
+	}
+
+	// going over the list of tasks and dumping out debug info where appropriate
+	for _, task := range tasksFinished {
 		if err := task.err; err != nil {
 			fail(t, err)
 		}

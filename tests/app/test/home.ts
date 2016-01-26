@@ -1,91 +1,82 @@
 /// <reference path="../typings/tsd.d.ts" />
-import supertest = require("supertest");
-import chai = require("chai");
+import * as supertest from "supertest";
+import * as test from "tape";
 
-let expect = chai.expect;
 let request = supertest("http://ApiServer");
 
 interface PostCallback {
   (id: number): void;
 }
-let createPost = (cb: PostCallback) => {
+let createPost = (t: test.Test, cb: PostCallback) => {
   request
     .post("/posts")
     .send({ body: "Hello, world!" })
     .end((err: Error, res: supertest.Response) => {
-      expect(err).to.equal(null);
-      expect(res.status).to.equal(200);
-      expect(typeof res.body.id).to.equal("number");
+      t.equal(null, err);
+      t.equal(200, res.status);
+      t.equal("number", typeof res.body.id);
       cb(res.body.id);
     });
 };
 
-describe("Homepage", () => {
-    it("Should return standard greeting", (done: MochaDone) => {
-      request
-        .get("/")
-        .end((err: Error, res: supertest.Response) => {
-          expect(err).to.equal(null);
-          expect(res.status).to.equal(200);
-          expect(res.text).to.equal("Hello, world!");
-          done();
-        });
+test("Homepage Should return standard greeting", (t: test.Test) => {
+  request
+    .get("/")
+    .end((err: Error, res: supertest.Response) => {
+      t.equal(null, err);
+      t.equal(200, res.status);
+      t.equal("Hello, world!", res.text);
+      t.end();
     });
 });
-describe("Ping endpoint", () => {
-  it("Should respond to standard ping", (done: MochaDone) => {
+test("Ping endpoint Should respond to standard ping", (t: test.Test) => {
+  request
+    .get("/ping")
+    .end((err: Error, res: supertest.Response) => {
+      t.equal(null, err);
+      t.equal(200, res.status);
+      t.equal("Pong", res.text);
+      t.end();
+    });
+});
+test("Json reflection Should return identical Json in response as provided by request", (t: test.Test) => {
+  let body = { greeting: "Hello, world!" };
+  request
+    .post("/reflection")
+    .send(body)
+    .end((err: Error, res: supertest.Response) => {
+      t.equal(null, err);
+      t.equal(200, res.status);
+      t.equal(body.greeting, res.body.greeting);
+      t.end();
+    });
+});
+test("Post creation endpoint Should return the new post's id", (t: test.Test) => {
+  createPost(t, (id: number) => {
+    t.end();
+  });
+});
+test("Post endpoint Should return a post", (t: test.Test) => {
+  createPost(t, (id: number) => {
+    let url = "/post/" + id;
     request
-      .get("/ping")
-      .end((err: Error, res: supertest.Response) => {
-        expect(err).to.equal(null);
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal("Pong");
-        done();
+      .get(url)
+      .end(function getPostEnd(err: Error, res: supertest.Response) {
+        t.equal(null, err, `GET ${url} err was not null`);
+        t.equal(200, res.status, `GET ${url} res.status was not 200`);
+        t.end();
       });
   });
 });
-describe("Json reflection", () => {
-  it("Should return identical Json in response as provided by request", (done: MochaDone) => {
-      let body = { greeting: "Hello, world!" };
-      request
-        .post("/reflection")
-        .send(body)
-        .end((err: Error, res: supertest.Response) => {
-          expect(err).to.equal(null);
-          expect(res.status).to.equal(200);
-          expect(res.body.greeting).to.equal(body.greeting);
-          done();
-        });
-  });
-});
-describe("Post creation endpoint", () => {
-  it("Should return the new post's id", (done: MochaDone) => {
-    createPost((id: number) => {
-      done();
-    });
-  });
-});
-describe("Post endpoint", () => {
-  it("Should return a post", (done: MochaDone) => {
-    createPost((id: number) => {
-      request
-        .get("/post/" + id)
-        .end((err: Error, res: supertest.Response) => {
-          expect(err).to.equal(null);
-          expect(res.status).to.equal(200);
-          done();
-        });
-    });
-  });
-  it("Should delete a post", (done: MochaDone) => {
-    createPost((id: number) => {
-      request
-        .delete("/post/" + id)
-        .end((err: Error, res: supertest.Response) => {
-          expect(err).to.equal(null);
-          expect(res.status).to.equal(200);
-          done();
-        });
-    });
+test("Post endpoint Should delete a post", (t: test.Test) => {
+  createPost(t, (id: number) => {
+    let url = "/post/" + id;
+    request
+      .delete(url)
+      .end(function deletePostEnd(err: Error, res: supertest.Response) {
+        t.equal(null, err, `DELETE ${url} err was not null`);
+        t.equal(200, res.status, `DELETE ${url} res.status was not 200`);
+        t.end();
+      });
   });
 });

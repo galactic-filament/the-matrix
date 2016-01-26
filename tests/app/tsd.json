@@ -5,23 +5,17 @@
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
+    "supertest/supertest.d.ts": {
+      "commit": "7fffbd3e040a93c244777e3be04cd6223ac69301"
+    },
     "superagent/superagent.d.ts": {
-      "commit": "70bf7e2bfeb0d5b1b651ef3219bcc65c8eec117e"
+      "commit": "7fffbd3e040a93c244777e3be04cd6223ac69301"
+    },
+    "tape/tape.d.ts": {
+      "commit": "7fffbd3e040a93c244777e3be04cd6223ac69301"
     },
     "node/node.d.ts": {
-      "commit": "70bf7e2bfeb0d5b1b651ef3219bcc65c8eec117e"
-    },
-    "supertest/supertest.d.ts": {
-      "commit": "70bf7e2bfeb0d5b1b651ef3219bcc65c8eec117e"
-    },
-    "assertion-error/assertion-error.d.ts": {
-      "commit": "70bf7e2bfeb0d5b1b651ef3219bcc65c8eec117e"
-    },
-    "chai/chai.d.ts": {
-      "commit": "70bf7e2bfeb0d5b1b651ef3219bcc65c8eec117e"
-    },
-    "mocha/mocha.d.ts": {
-      "commit": "70bf7e2bfeb0d5b1b651ef3219bcc65c8eec117e"
+      "commit": "7fffbd3e040a93c244777e3be04cd6223ac69301"
     }
   }
 }

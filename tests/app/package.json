@@ -7,16 +7,14 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha -R spec --compilers ts:ts-node/register --timeout 10000"
+    "test": "ts-node node_modules/tape/bin/tape ./test/**/*.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "chai": "^3.4.0",
-    "supertest": "^1.1.0"
+    "supertest": "^1.1.0",
+    "tap-parser": "^1.2.2",
+    "tape": "^4.4.0"
   },
-  "dependencies": {
-    "ts-node": "^0.5.5",
-    "typescript": "^1.7.5"
-  }
+  "dependencies": {}
 }

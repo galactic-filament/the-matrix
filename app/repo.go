@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -9,6 +11,17 @@ import (
 	"strings"
 	"time"
 )
+
+type testOutputLine struct {
+	Message  string `json:"message"`
+	Line     string `json:"line"`
+	Expected string `json:"expected"`
+	Actual   string `json:"actual"`
+}
+
+type testOutput struct {
+	Output []testOutputLine `json:"output"`
+}
 
 // repo manager
 type repoManager struct {
@@ -38,16 +51,17 @@ func (r repo) runRepoCommand(name string) ([]byte, error) {
 	return runCommand(fmt.Sprintf("cd %s && %s", r.clonePath(), name))
 }
 
-func (r repo) log() *log.Entry {
-	return log.WithFields(log.Fields{"repo": r.name})
+func (r repo) log(fields map[string]interface{}) *log.Entry {
+	fields["repo"] = r.name
+	return log.WithFields(fields)
 }
 
 func (r repo) logInfo(message string) {
-	r.log().Info(message)
+	r.log(map[string]interface{}{}).Info(message)
 }
 
 func (r repo) logWarning(message string) {
-	r.log().Warning(message)
+	r.log(map[string]interface{}{}).Warning(message)
 }
 
 func (r repo) runTests() (err error) {
@@ -128,7 +142,34 @@ func (r repo) cleanup(prevErr error) (err error) {
 	r.logInfo("Cleaning up")
 
 	// cleaning up the test container
-	if r.testContainer != nil && r.testFailed == false {
+	if r.testContainer != nil {
+		// optionally fetching the test container's output for debugging
+		if r.testFailed {
+			// gathering up the logs
+			var output bytes.Buffer
+			err := r.client.Logs(docker.LogsOptions{
+				Container:    r.testContainer.ID,
+				Stdout:       true,
+				OutputStream: &output,
+			})
+			if err != nil {
+				return err
+			}
+
+			// reading the logs and checking for errors
+			var parsedOutput testOutput
+			if err := json.NewDecoder(strings.NewReader(output.String())).Decode(&parsedOutput); err != nil {
+				return err
+			}
+
+			for _, outputLine := range parsedOutput.Output {
+				r.log(map[string]interface{}{
+					"expected": outputLine.Expected,
+					"actual":   outputLine.Actual,
+				}).Warning(outputLine.Message)
+			}
+		}
+
 		r.logInfo("Removing test container")
 		err = r.client.RemoveContainer(docker.RemoveContainerOptions{
 			ID:            r.testContainer.ID,
@@ -146,13 +187,9 @@ func (r repo) cleanup(prevErr error) (err error) {
 		return err
 	}
 
-	// cleaning up the web-test service containers
-	if r.testFailed == false {
-		r.logInfo("Remove containers")
-		if _, err = r.runRepoCommand("docker rm -v $(docker-compose ps -q)"); err != nil {
-			r.logInfo("Could not remove containers")
-			return err
-		}
+	if _, err = r.runRepoCommand("docker rm -v $(docker-compose ps -q)"); err != nil {
+		r.logInfo("Could not remove containers")
+		return err
 	}
 
 	// removing the cloned repo

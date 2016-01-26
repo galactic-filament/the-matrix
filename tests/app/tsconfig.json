@@ -22,13 +22,12 @@
     "compileOnSave": false,
     "buildOnSave": false,
     "files": [
+        "src/tap-parser.ts",
         "test/home.ts",
-        "typings/assertion-error/assertion-error.d.ts",
-        "typings/chai/chai.d.ts",
-        "typings/mocha/mocha.d.ts",
         "typings/node/node.d.ts",
         "typings/superagent/superagent.d.ts",
         "typings/supertest/supertest.d.ts",
+        "typings/tape/tape.d.ts",
         "typings/tsd.d.ts"
     ],
     "atom": {

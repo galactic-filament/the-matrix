@@ -1,4 +1,4 @@
 #!/bin/bash
 
 while ! nc -z ApiServer 80; do echo 'sleeping for 3' && sleep 3; done
-npm test
+npm test --silent | ts-node src/tap-parser.ts
