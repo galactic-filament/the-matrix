@@ -8,53 +8,55 @@ interface PostCallback {
   (id: number): void;
 }
 let createPost = (t: test.Test, cb: PostCallback) => {
+  let url = "/posts";
   request
-    .post("/posts")
+    .post(url)
     .send({ body: "Hello, world!" })
     .end((err: Error, res: supertest.Response) => {
-      t.equal(null, err);
-      t.equal(200, res.status);
-      t.equal("number", typeof res.body.id);
+      t.equal(err, null, `POST ${url} err was not null`);
+      t.equal(res.status, 200, `POST ${url} res.status was not 200`);
+      t.equal(typeof res.body.id, "number", `POST ${url} body.id was not a number`);
       cb(res.body.id);
     });
 };
 
 test("Homepage Should return standard greeting", (t: test.Test) => {
+  let url = "/";
   request
-    .get("/")
+    .get(url)
     .end((err: Error, res: supertest.Response) => {
-      t.equal(null, err);
-      t.equal(200, res.status);
-      t.equal("Hello, world!", res.text);
+      t.equal(err, null, `GET ${url} err was not null`);
+      t.equal(res.status, 200, `GET ${url} res.status was not 200`);
+      t.equal(res.text, "Hello, world!", `GET  ${url} response body was not Hello, world!`);
       t.end();
     });
 });
 test("Ping endpoint Should respond to standard ping", (t: test.Test) => {
+  let url = "/ping";
   request
-    .get("/ping")
+    .get(url)
     .end((err: Error, res: supertest.Response) => {
-      t.equal(null, err);
-      t.equal(200, res.status);
-      t.equal("Pong", res.text);
+      t.equal(err, null, `GET ${url} err was not null`);
+      t.equal(res.status, 200, `GET ${url} res.status was not 200`);
+      t.equal(res.text, "Pong", `GET ${url} response body was not Pong`);
       t.end();
     });
 });
 test("Json reflection Should return identical Json in response as provided by request", (t: test.Test) => {
+  let url = "/reflection";
   let body = { greeting: "Hello, world!" };
   request
-    .post("/reflection")
+    .post(url)
     .send(body)
     .end((err: Error, res: supertest.Response) => {
-      t.equal(null, err);
-      t.equal(200, res.status);
-      t.equal(body.greeting, res.body.greeting);
+      t.equal(err, null, `POST ${url} err was not null`);
+      t.equal(res.status, 200, `POST ${url} res.status was not 200`);
+      t.equal(res.body.greeting, body.greeting, `POST ${url} greeting did not match`);
       t.end();
     });
 });
 test("Post creation endpoint Should return the new post's id", (t: test.Test) => {
-  createPost(t, (id: number) => {
-    t.end();
-  });
+  createPost(t, (id: number) => t.end());
 });
 test("Post endpoint Should return a post", (t: test.Test) => {
   createPost(t, (id: number) => {
@@ -62,8 +64,8 @@ test("Post endpoint Should return a post", (t: test.Test) => {
     request
       .get(url)
       .end(function getPostEnd(err: Error, res: supertest.Response) {
-        t.equal(null, err, `GET ${url} err was not null`);
-        t.equal(200, res.status, `GET ${url} res.status was not 200`);
+        t.equal(err, null, `GET ${url} err was not null`);
+        t.equal(res.status, 200, `GET ${url} res.status was not 200`);
         t.end();
       });
   });
@@ -74,8 +76,8 @@ test("Post endpoint Should delete a post", (t: test.Test) => {
     request
       .delete(url)
       .end(function deletePostEnd(err: Error, res: supertest.Response) {
-        t.equal(null, err, `DELETE ${url} err was not null`);
-        t.equal(200, res.status, `DELETE ${url} res.status was not 200`);
+        t.equal(err, null, `DELETE ${url} err was not null`);
+        t.equal(res.status, 200, `DELETE ${url} res.status was not 200`);
         t.end();
       });
   });
