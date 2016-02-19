@@ -29,3 +29,9 @@ said stacks.
 Eventually I may move onto heavier frameworks (ie: Rails, Symfony, Django), but
 for now, in the interest of time, I have found it easier to get started with
 microframeworks.
+
+## TODO
+
+* virtualenv + Django
+* rvm + Rails
+* [hug](https://github.com/timothycrosley/hug)
