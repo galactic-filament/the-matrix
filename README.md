@@ -35,3 +35,4 @@ microframeworks.
 * virtualenv + Django
 * rvm + Rails
 * [hug](https://github.com/timothycrosley/hug)
+* [Play](https://www.playframework.com/)
