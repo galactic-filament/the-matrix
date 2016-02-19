@@ -62,3 +62,15 @@ baseUri: http://ApiServer/
               { "id": 1, "body": "Hello, world!" }
   delete:
     description: Should delete a post
+  put:
+    description: Should update a post
+    body:
+      application/json:
+        schema: |
+          { "body": "Jello, world!" }
+    responses:
+      200:
+        body:
+          application/json:
+            schema: |
+              { "id": 1, "body": "Hello, world!" }
