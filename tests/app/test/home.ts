@@ -85,12 +85,14 @@ test("Post endpoint Should delete a post", (t: test.Test) => {
 test("Post endpoint Should update a post", (t: test.Test) => {
   createPost(t, (id: number) => {
     let url = "/post/" + id;
+    let body = { body: "Jello, world!" };
     request
       .put(url)
-      .send({ body: "Jello, world!" })
+      .send(body)
       .end(function updatePostEnd(err: Error, res: supertest.Response) {
         t.equal(err, null, `PUT ${url} err was not null`);
         t.equal(res.status, 200, `PUT ${url} res.status was not 200`);
+        t.equal(res.body.body, body.body, `PUT ${url} request and response bodies did not match`);
         t.end();
       });
   });
