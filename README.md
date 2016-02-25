@@ -32,8 +32,8 @@ microframeworks.
 
 ## TODO
 
-* virtualenv + Django
-* rvm + Rails
-* [hug](https://github.com/timothycrosley/hug)
-* [Play](https://www.playframework.com/)
-* [Swift](https://swiftpkgs.ng.bluemix.net/package/51308720)
+* [virtualenv](https://virtualenv.readthedocs.org/en/latest/) + [Django](https://www.djangoproject.com/) (Python)
+* [rvm](https://rvm.io/) + [Rails](http://rubyonrails.org/) (Ruby)
+* [hug](https://github.com/timothycrosley/hug) (Python)
+* [Play](https://www.playframework.com/) (Scala)
+* [Kitura](https://swiftpkgs.ng.bluemix.net/package/51308720) (Swift)
