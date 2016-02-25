@@ -36,3 +36,4 @@ microframeworks.
 * rvm + Rails
 * [hug](https://github.com/timothycrosley/hug)
 * [Play](https://www.playframework.com/)
+* [Swift](https://swiftpkgs.ng.bluemix.net/package/51308720)
