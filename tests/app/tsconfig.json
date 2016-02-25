@@ -23,12 +23,7 @@
     "buildOnSave": false,
     "files": [
         "src/tap-parser.ts",
-        "test/home.ts",
-        "typings/node/node.d.ts",
-        "typings/superagent/superagent.d.ts",
-        "typings/supertest/supertest.d.ts",
-        "typings/tape/tape.d.ts",
-        "typings/tsd.d.ts"
+        "test/home.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

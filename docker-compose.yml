@@ -12,16 +12,3 @@ test-suite-dev:
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - ./app:/go/src/github.com/ihsw/the-matrix/app
-
-base-raml-viewer:
-  image: ihsw/the-matrix-raml-viewer
-raml-viewer:
-  extends:
-    service: base-raml-viewer
-  ports:
-    - 80:80
-raml-viewer-dev:
-  extends:
-    service: raml-viewer
-  volumes:
-    - ./raml-viewer/app:/srv/app
