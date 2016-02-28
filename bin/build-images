@@ -1,4 +1,3 @@
 #! /bin/bash
 
-docker build -t ihsw/the-matrix . \
-  && docker build -t ihsw/the-matrix-tests ./tests
+docker build -t ihsw/the-matrix .
