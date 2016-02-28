@@ -32,7 +32,9 @@ microframeworks.
 
 ## TODO
 
-* virtualenv + Django
-* rvm + Rails
-* [hug](https://github.com/timothycrosley/hug)
-* [Play](https://www.playframework.com/)
+* [virtualenv](https://virtualenv.readthedocs.org/en/latest/) + [Django](https://www.djangoproject.com/) (Python)
+* [rvm](https://rvm.io/) + [Rails](http://rubyonrails.org/) (Ruby)
+* [hug](https://github.com/timothycrosley/hug) (Python)
+* [Play](https://www.playframework.com/) (Scala)
+* [Kitura](https://github.com/IBM-Swift/Kitura) (Swift)
+* [ASP.NET](https://github.com/aspnet/Home/wiki) (C#, [Dockerhub](https://hub.docker.com/r/microsoft/aspnet/))
