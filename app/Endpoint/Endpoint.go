@@ -2,7 +2,6 @@ package Endpoint
 
 import (
 	"github.com/ihsw/the-matrix/app/Repo"
-
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"strings"
 )

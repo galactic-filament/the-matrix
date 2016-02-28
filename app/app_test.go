@@ -15,7 +15,7 @@ func fail(t *testing.T, err error) {
 }
 
 func init() {
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func TestTestSuite(t *testing.T) {
@@ -67,6 +67,9 @@ func TestTestSuite(t *testing.T) {
 	for _, endpoint := range endpoints {
 		err := Work.RunEndpoint(endpoint, clients)
 		if err != nil {
+			log.WithFields(log.Fields{
+				"endpoint": endpoint.Repo.Name,
+			}).Warn("Endpoint run failed")
 			fail(t, err)
 			return
 		}

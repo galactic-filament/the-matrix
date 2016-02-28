@@ -3,6 +3,7 @@ package Work
 import (
 	"errors"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
 )
@@ -54,6 +55,10 @@ func RunEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 	for _, c := range clients {
 		_, err := RunClient(c, e)
 		if err != nil {
+			log.WithFields(log.Fields{
+				"client": c.Repo.Name,
+			}).Warn("Client run failed")
+
 			return err
 		}
 	}
