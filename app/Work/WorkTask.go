@@ -7,7 +7,7 @@ import (
 	"github.com/ihsw/the-matrix/app/Util"
 )
 
-type workTask struct {
+type clientWorkTask struct {
 	endpoint   Endpoint.Endpoint
 	client     Client.Client
 	testOutput *Client.TestOutput
@@ -17,11 +17,11 @@ type workTask struct {
 func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 	// setting up the workers
 	in := make(chan Client.Client)
-	out := make(chan workTask)
+	out := make(chan clientWorkTask)
 	worker := func() {
 		for client := range in {
 			testOutput, err := runClient(client, endpoint)
-			out <- workTask{
+			out <- clientWorkTask{
 				endpoint:   endpoint,
 				client:     client,
 				err:        err,
@@ -42,23 +42,23 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 
 	// waiting for it to drain out
 	var lastError error
-	for workTask := range out {
-		if workTask.err != nil {
+	for task := range out {
+		if task.err != nil {
 			continue
 		}
 
-		lastError = workTask.err
+		lastError = task.err
 		log.WithFields(log.Fields{
-			"endpoint": workTask.endpoint.Repo.Name,
-			"client":   workTask.client.Repo.Name,
-			"err":      workTask.err.Error(),
+			"endpoint": task.endpoint.Repo.Name,
+			"client":   task.client.Repo.Name,
+			"err":      task.err.Error(),
 		}).Warn("Client run failed")
 
-		if workTask.testOutput != nil {
-			for _, line := range workTask.testOutput.Results {
+		if task.testOutput != nil {
+			for _, line := range task.testOutput.Results {
 				log.WithFields(log.Fields{
-					"endpoint": workTask.endpoint.Repo.Name,
-					"client":   workTask.client.Repo.Name,
+					"endpoint": task.endpoint.Repo.Name,
+					"client":   task.client.Repo.Name,
 					"expected": line.Expected,
 					"actual":   line.Actual,
 				}).Warn(line.Message)
