@@ -63,15 +63,9 @@ func TestTestSuite(t *testing.T) {
 		return
 	}
 
-	// running the clients against the endpoints
-	for _, endpoint := range endpoints {
-		err := Work.RunEndpoint(endpoint, clients)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"endpoint": endpoint.Repo.Name,
-			}).Warn("Endpoint run failed")
-			fail(t, err)
-			return
-		}
+	err = Work.RunEndpoints(endpoints, clients)
+	if err != nil {
+		fail(t, err)
+		return
 	}
 }

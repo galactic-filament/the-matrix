@@ -43,7 +43,7 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 	// waiting for it to drain out
 	var lastError error
 	for task := range out {
-		if task.err != nil {
+		if task.err == nil {
 			continue
 		}
 
@@ -64,6 +64,52 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 				}).Warn(line.Message)
 			}
 		}
+	}
+
+	return lastError
+}
+
+type endpointWorkTask struct {
+	endpoint Endpoint.Endpoint
+	err      error
+}
+
+// RunEndpoints - runs clients against endpoints
+func RunEndpoints(endpoints []Endpoint.Endpoint, clients []Client.Client) error {
+	// setting up the workers
+	in := make(chan Endpoint.Endpoint)
+	out := make(chan endpointWorkTask)
+	worker := func() {
+		for endpoint := range in {
+			err := runEndpoint(endpoint, clients)
+			out <- endpointWorkTask{
+				endpoint: endpoint,
+				err:      err,
+			}
+		}
+	}
+	postWork := func() { close(out) }
+
+	// starting it up
+	go func() {
+		for _, endpoint := range endpoints {
+			in <- endpoint
+		}
+		close(in)
+	}()
+	Util.Work(4, worker, postWork)
+
+	// waiting for it to drain out
+	var lastError error
+	for task := range out {
+		if task.err == nil {
+			continue
+		}
+
+		log.WithFields(log.Fields{
+			"endpoint": task.endpoint.Repo.Name,
+		}).Warn("Endpoint run failed")
+		lastError = task.err
 	}
 
 	return lastError

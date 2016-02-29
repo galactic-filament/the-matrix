@@ -49,8 +49,8 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 	return nil, nil
 }
 
-// RunEndpoint - starts up an Endpoint and runs Clients against it
-func RunEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
+// runEndpoint - starts up an Endpoint and runs Clients against it
+func runEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 	err := e.Start()
 	if err != nil {
 		return err
