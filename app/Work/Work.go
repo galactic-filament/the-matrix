@@ -50,6 +50,13 @@ func RunClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 	return nil, nil
 }
 
+type failedClient struct {
+	endpoint   Endpoint.Endpoint
+	client     Client.Client
+	err        error
+	testOutput *Client.TestOutput
+}
+
 // RunEndpoint - starts up an Endpoint and runs Clients against it
 func RunEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 	err := e.Start()
@@ -57,26 +64,37 @@ func RunEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 		return err
 	}
 
+	failedClients := []failedClient{}
 	for _, c := range clients {
 		testOutput, err := RunClient(c, e)
 		if err != nil {
+			failedClients = append(failedClients, failedClient{
+				endpoint:   e,
+				client:     c,
+				err:        err,
+				testOutput: testOutput,
+			})
+		}
+	}
+
+	if len(failedClients) > 0 {
+		for _, f := range failedClients {
 			log.WithFields(log.Fields{
-				"endpoint": e.Repo.Name,
-				"client":   c.Repo.Name,
+				"endpoint": f.endpoint.Repo.Name,
+				"client":   f.client.Repo.Name,
+				"err":      f.err.Error(),
 			}).Warn("Client run failed")
 
-			if testOutput != nil {
-				for _, line := range testOutput.Results {
+			if f.testOutput != nil {
+				for _, line := range f.testOutput.Results {
 					log.WithFields(log.Fields{
-						"endpoint": e.Repo.Name,
-						"client":   c.Repo.Name,
+						"endpoint": f.endpoint.Repo.Name,
+						"client":   f.client.Repo.Name,
 						"expected": line.Expected,
 						"actual":   line.Actual,
 					}).Warn(line.Message)
 				}
 			}
-
-			return err
 		}
 	}
 
