@@ -10,7 +10,7 @@ import (
 // runClient - starts up the Client container, runs it against the Endpoint, and exits
 func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error) {
 	container, err := c.SimpleDocker.CreateContainer(
-		fmt.Sprintf("%s-client", c.Name),
+		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
 		fmt.Sprintf("ihsw/%s", c.Name),
 	)
 	if err != nil {
