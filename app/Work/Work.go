@@ -9,40 +9,45 @@ import (
 )
 
 // RunClient - starts up the Client container, runs it against the Endpoint, and exits
-func RunClient(c Client.Client, e Endpoint.Endpoint) (string, error) {
+func RunClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error) {
 	container, err := c.SimpleDocker.CreateContainer(
 		fmt.Sprintf("%s-client", c.Name),
 		fmt.Sprintf("ihsw/%s", c.Name),
 	)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	endpointContainerID, err := e.GetContainerID()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	failed, err := c.SimpleDocker.RunContainer(container, endpointContainerID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	containerLogs, err := c.SimpleDocker.GetContainerLogs(container)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if failed {
-		return containerLogs, errors.New("Test container exited with non-zero status")
+		testOutput, err := Client.ParseClientLogs(containerLogs)
+		if err != nil {
+			return nil, errors.New("Client logs could not be parsed")
+		}
+
+		return testOutput, errors.New("Test container exited with non-zero status")
 	}
 
 	err = c.SimpleDocker.RemoveContainer(container)
 	if err != nil {
-		return containerLogs, err
+		return nil, err
 	}
 
-	return containerLogs, nil
+	return nil, nil
 }
 
 // RunEndpoint - starts up an Endpoint and runs Clients against it
@@ -53,11 +58,23 @@ func RunEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 	}
 
 	for _, c := range clients {
-		_, err := RunClient(c, e)
+		testOutput, err := RunClient(c, e)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"client": c.Repo.Name,
+				"endpoint": e.Repo.Name,
+				"client":   c.Repo.Name,
 			}).Warn("Client run failed")
+
+			if testOutput != nil {
+				for _, line := range testOutput.Results {
+					log.WithFields(log.Fields{
+						"endpoint": e.Repo.Name,
+						"client":   c.Repo.Name,
+						"expected": line.Expected,
+						"actual":   line.Actual,
+					}).Warn(line.Message)
+				}
+			}
 
 			return err
 		}
