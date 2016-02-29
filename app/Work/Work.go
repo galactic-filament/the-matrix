@@ -3,8 +3,10 @@ package Work
 import (
 	"errors"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
+	"time"
 )
 
 // runClient - starts up the Client container, runs it against the Endpoint, and exits
@@ -14,8 +16,16 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 		fmt.Sprintf("ihsw/%s", c.Name),
 	)
 	if err != nil {
+		log.WithFields(log.Fields{
+			"endpoint": e.Name,
+			"client":   c.Name,
+			"err":      err.Error(),
+		}).Warn("Could not create a client container")
+
 		return nil, err
 	}
+
+	time.Sleep(10 * time.Second)
 
 	endpointContainerID, err := e.GetContainerID()
 	if err != nil {
