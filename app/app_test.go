@@ -7,6 +7,7 @@ import (
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Work"
 	"github.com/stretchr/testify/assert"
+	"runtime"
 	"testing"
 )
 
@@ -16,6 +17,7 @@ func fail(t *testing.T, err error) {
 
 func init() {
 	log.SetLevel(log.InfoLevel)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
 func TestTestSuite(t *testing.T) {

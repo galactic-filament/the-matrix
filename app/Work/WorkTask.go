@@ -38,7 +38,7 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 		}
 		close(in)
 	}()
-	Util.Work(4, worker, postWork)
+	Util.Work(len(clients), worker, postWork)
 
 	// waiting for it to drain out
 	var lastError error
@@ -97,7 +97,7 @@ func RunEndpoints(endpoints []Endpoint.Endpoint, clients []Client.Client) error 
 		}
 		close(in)
 	}()
-	Util.Work(4, worker, postWork)
+	Util.Work(len(clients), worker, postWork)
 
 	// waiting for it to drain out
 	var lastError error
