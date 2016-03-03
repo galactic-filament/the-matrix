@@ -9,6 +9,7 @@ This is a listing of projects I am writing in various web frameworks.
 Name | Stack | Microframework | Tests | Build Badge
 ---- | ----- | -------------- | ----- | -----------
 [omega-jazz](https://github.com/ihsw/omega-jazz) | Ruby | Sinatra | Minitest | [![Build Status](https://travis-ci.org/ihsw/omega-jazz.svg?branch=master)](https://travis-ci.org/ihsw/omega-jazz)
+[crazy-train](https://github.com/ihsw/crazy-train) | Ruby | Rails | RSpec | [![Build Status](https://travis-ci.org/ihsw/crazy-train.svg?branch=master)](https://travis-ci.org/ihsw/crazy-train)
 [pho-sho](https://github.com/ihsw/pho-sho) | PHP | Silex | phpunit | [![Build Status](https://travis-ci.org/ihsw/pho-sho.svg?branch=master)](https://travis-ci.org/ihsw/pho-sho)
 [go-home](https://github.com/ihsw/go-home) | Go | Gorilla Mux | stdlib | [![Build Status](https://travis-ci.org/ihsw/go-home.svg?branch=master)](https://travis-ci.org/ihsw/go-home)
 [py-lyfe](https://github.com/ihsw/py-lyfe) | Python | Flask | py.test | [![Build Status](https://travis-ci.org/ihsw/py-lyfe.svg?branch=master)](https://travis-ci.org/ihsw/py-lyfe)
