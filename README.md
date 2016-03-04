@@ -35,7 +35,6 @@ microframeworks.
 ## TODO
 
 * [virtualenv](https://virtualenv.readthedocs.org/en/latest/) + [Django](https://www.djangoproject.com/) (Python)
-* [rvm](https://rvm.io/) + [Rails](http://rubyonrails.org/) (Ruby)
 * [hug](https://github.com/timothycrosley/hug) (Python)
 * [Play](https://www.playframework.com/) (Scala)
 * [Kitura](https://github.com/IBM-Swift/Kitura) (Swift)
