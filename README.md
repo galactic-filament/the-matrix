@@ -11,6 +11,7 @@ Name | Stack | Microframework | Tests | Build Badge
 [omega-jazz](https://github.com/ihsw/omega-jazz) | Ruby | Sinatra | Minitest | [![Build Status](https://travis-ci.org/ihsw/omega-jazz.svg?branch=master)](https://travis-ci.org/ihsw/omega-jazz)
 [crazy-train](https://github.com/ihsw/crazy-train) | Ruby | Rails | RSpec | [![Build Status](https://travis-ci.org/ihsw/crazy-train.svg?branch=master)](https://travis-ci.org/ihsw/crazy-train)
 [pho-sho](https://github.com/ihsw/pho-sho) | PHP | Silex | phpunit | [![Build Status](https://travis-ci.org/ihsw/pho-sho.svg?branch=master)](https://travis-ci.org/ihsw/pho-sho)
+[fur-elise](https://github.com/ihsw/fur-elise) | PHP | Symfony | phpunit | [![Build Status](https://travis-ci.org/ihsw/fur-elise.svg?branch=master)](https://travis-ci.org/ihsw/fur-elise)
 [go-home](https://github.com/ihsw/go-home) | Go | Gorilla Mux | stdlib | [![Build Status](https://travis-ci.org/ihsw/go-home.svg?branch=master)](https://travis-ci.org/ihsw/go-home)
 [py-lyfe](https://github.com/ihsw/py-lyfe) | Python | Flask | py.test | [![Build Status](https://travis-ci.org/ihsw/py-lyfe.svg?branch=master)](https://travis-ci.org/ihsw/py-lyfe)
 [es-bueno](https://github.com/ihsw/es-bueno) | NodeJS | Express | Mocha    | [![Build Status](https://travis-ci.org/ihsw/es-bueno.svg?branch=master)](https://travis-ci.org/ihsw/es-bueno)
