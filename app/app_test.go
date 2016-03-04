@@ -54,6 +54,7 @@ func TestTestSuite(t *testing.T) {
 		"py-lyfe",
 		"es-bueno",
 		"crazy-train",
+		"fur-elise",
 	}
 	endpoints, err := Endpoint.NewEndpoints(
 		endpointRepoNames,
