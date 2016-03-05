@@ -30,6 +30,7 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 		}
 	}
 	postWork := func() { close(out) }
+	Util.Work(len(clients), worker, postWork)
 
 	// starting it up
 	go func() {
@@ -38,7 +39,6 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 		}
 		close(in)
 	}()
-	Util.Work(len(clients), worker, postWork)
 
 	// waiting for it to drain out
 	var lastError error
@@ -89,6 +89,7 @@ func RunEndpoints(endpoints []Endpoint.Endpoint, clients []Client.Client) error 
 		}
 	}
 	postWork := func() { close(out) }
+	Util.Work(len(endpoints), worker, postWork)
 
 	// starting it up
 	go func() {
@@ -97,7 +98,6 @@ func RunEndpoints(endpoints []Endpoint.Endpoint, clients []Client.Client) error 
 		}
 		close(in)
 	}()
-	Util.Work(len(clients), worker, postWork)
 
 	// waiting for it to drain out
 	var lastError error
