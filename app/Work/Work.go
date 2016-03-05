@@ -11,6 +11,11 @@ import (
 
 // runClient - starts up the Client container, runs it against the Endpoint, and exits
 func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error) {
+	log.WithFields(log.Fields{
+		"endpoint": e.Name,
+		"client":   c.Name,
+	}).Info("Running client")
+
 	container, err := c.SimpleDocker.CreateContainer(
 		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
 		fmt.Sprintf("ihsw/%s", c.Name),
@@ -61,6 +66,10 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 
 // runEndpoint - starts up an Endpoint and runs Clients against it
 func runEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
+	log.WithFields(log.Fields{
+		"endpoint": e.Name,
+	}).Info("Running endpoint")
+
 	err := e.Start()
 	if err != nil {
 		return err

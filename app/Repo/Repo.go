@@ -2,6 +2,7 @@ package Repo
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Util"
 	"os"
@@ -17,6 +18,10 @@ type Repo struct {
 
 // NewRepo - creates a new Repo
 func NewRepo(name string, gitFormat string, cloneDirectory string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) {
+	log.WithFields(log.Fields{
+		"name": name,
+	}).Info("Creating new repo")
+
 	r := Repo{
 		Name:           name,
 		gitFormat:      gitFormat,
