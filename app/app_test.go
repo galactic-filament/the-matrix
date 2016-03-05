@@ -7,6 +7,7 @@ import (
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Work"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"runtime"
 	"testing"
 )
@@ -16,7 +17,11 @@ func fail(t *testing.T, err error) {
 }
 
 func init() {
-	log.SetLevel(log.InfoLevel)
+	logLevel := log.WarnLevel
+	if os.Getenv("ENV") == "travis" {
+		logLevel = log.InfoLevel
+	}
+	log.SetLevel(logLevel)
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 

@@ -1,5 +1,7 @@
 test-suite-base:
   image: ihsw/the-matrix
+  environment:
+    - ENV=local
   command: go test -v github.com/ihsw/the-matrix/app/...
 
 test-suite:

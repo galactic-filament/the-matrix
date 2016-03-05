@@ -5,6 +5,8 @@ go:
 services:
   - docker
 
+env:
+  - ENV=travis
 before_script:
   - go vet github.com/ihsw/the-matrix/app/...
   - ./bin/build-images
