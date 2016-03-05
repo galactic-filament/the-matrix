@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
 	"time"
@@ -53,15 +54,20 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 			return nil, errors.New("Client logs could not be parsed")
 		}
 
-		return testOutput, errors.New("Test container exited with non-zero status")
+		return testOutput, cleanClient(container, c, errors.New("Test container exited with non-zero status"))
 	}
 
-	err = c.SimpleDocker.RemoveContainer(container)
+	return nil, cleanClient(container, c, nil)
+}
+
+// cleanClient - removes the client container
+func cleanClient(container *docker.Container, c Client.Client, prevErr error) error {
+	err := c.SimpleDocker.RemoveContainer(container)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return nil, nil
+	return prevErr
 }
 
 // runEndpoint - starts up an Endpoint and runs Clients against it
@@ -75,12 +81,12 @@ func runEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 		return err
 	}
 
-	err = runClients(e, clients)
-	if err != nil {
-		return err
-	}
+	return cleanEndpoint(e, runClients(e, clients))
+}
 
-	err = e.Stop()
+// cleanEndpoint - stops all endpoint services and removes their containers
+func cleanEndpoint(e Endpoint.Endpoint, prevErr error) error {
+	err := e.Stop()
 	if err != nil {
 		return err
 	}
@@ -90,5 +96,5 @@ func runEndpoint(e Endpoint.Endpoint, clients []Client.Client) error {
 		return err
 	}
 
-	return nil
+	return prevErr
 }
