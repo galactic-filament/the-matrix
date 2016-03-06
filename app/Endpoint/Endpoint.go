@@ -41,7 +41,7 @@ func newEndpoint(repo Repo.Repo, resources []Resource.Resource) (Endpoint, error
 func getContainer(e Endpoint, resources []Resource.Resource) (*docker.Container, error) {
 	log.WithFields(log.Fields{
 		"endpoint": e.Name,
-	}).Info("Creating container")
+	}).Info("Creating endpoint container")
 
 	container, err := e.SimpleDocker.CreateContainer(
 		fmt.Sprintf("%s-endpoint", e.Name),

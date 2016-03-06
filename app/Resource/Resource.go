@@ -2,6 +2,7 @@ package Resource
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 )
@@ -38,6 +39,10 @@ func newResource(name string, endpointTarget string, simpleDocker SimpleDocker.S
 }
 
 func getContainer(r Resource) (*docker.Container, error) {
+	log.WithFields(log.Fields{
+		"name": r.Name,
+	}).Info("Creating resource container")
+
 	container, err := r.simpleDocker.CreateContainer(
 		fmt.Sprintf("%s-resource", r.Name),
 		fmt.Sprintf("ihsw/the-matrix-%s", r.Name),
