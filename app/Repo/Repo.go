@@ -48,6 +48,10 @@ func newRepo(name string, gitFormat string, cloneDirectory string, simpleDocker 
 		return Repo{}, err
 	}
 
+	log.WithFields(log.Fields{
+		"name": name,
+	}).Info("Repo create success")
+
 	return r, nil
 }
 
