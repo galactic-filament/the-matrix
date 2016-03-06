@@ -46,6 +46,7 @@ func getContainer(r Resource) (*docker.Container, error) {
 	container, err := r.simpleDocker.CreateContainer(
 		fmt.Sprintf("%s-resource", r.Name),
 		fmt.Sprintf("ihsw/the-matrix-%s", r.Name),
+		[]string{},
 	)
 	if err != nil {
 		return nil, err

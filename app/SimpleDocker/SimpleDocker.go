@@ -21,10 +21,13 @@ func NewSimpleDocker(endpoint string) (SimpleDocker, error) {
 }
 
 // CreateContainer - creates a container but doesn't start it up
-func (s SimpleDocker) CreateContainer(name string, image string) (*docker.Container, error) {
+func (s SimpleDocker) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
 	container, err := s.client.CreateContainer(docker.CreateContainerOptions{
-		Name:   name,
-		Config: &docker.Config{Image: image},
+		Name: name,
+		Config: &docker.Config{
+			Image: image,
+			Env:   envVars,
+		},
 	})
 	if err != nil {
 		return nil, err

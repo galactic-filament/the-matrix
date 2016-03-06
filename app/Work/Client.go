@@ -81,6 +81,7 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 	container, err := c.SimpleDocker.CreateContainer(
 		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
 		fmt.Sprintf("ihsw/%s", c.Name),
+		[]string{},
 	)
 	if err != nil {
 		return nil, err
