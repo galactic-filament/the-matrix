@@ -2,7 +2,6 @@ package SimpleDocker
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/fsouza/go-dockerclient"
 )
 
@@ -49,11 +48,19 @@ func (s SimpleDocker) GetContainerLogs(container *docker.Container) (string, err
 	return output.String(), nil
 }
 
-// RunContainer - starts a container against an ApiServer container
-func (s SimpleDocker) RunContainer(container *docker.Container, apiContainerID string) (bool, error) {
-	err := s.client.StartContainer(container.ID, &docker.HostConfig{
-		Links: []string{fmt.Sprintf("%s:ApiServer", apiContainerID)},
-	})
+// StartContainer - starts a container up
+func (s SimpleDocker) StartContainer(container *docker.Container, links []string) error {
+	err := s.client.StartContainer(container.ID, &docker.HostConfig{Links: links})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// RunContainer - starts a container with links and waits for it to exit
+func (s SimpleDocker) RunContainer(container *docker.Container, links []string) (bool, error) {
+	err := s.StartContainer(container, links)
 	if err != nil {
 		return false, err
 	}
@@ -67,6 +74,11 @@ func (s SimpleDocker) RunContainer(container *docker.Container, apiContainerID s
 	}
 
 	return false, nil
+}
+
+// StopContainer - stops a container
+func (s SimpleDocker) StopContainer(container *docker.Container) error {
+	return s.client.StopContainer(container.ID, 10)
 }
 
 // RemoveContainer - removes a container

@@ -16,8 +16,7 @@ type Repo struct {
 	SimpleDocker   SimpleDocker.SimpleDocker
 }
 
-// NewRepo - creates a new Repo
-func NewRepo(name string, gitFormat string, cloneDirectory string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) {
+func newRepo(name string, gitFormat string, cloneDirectory string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) {
 	log.WithFields(log.Fields{
 		"name": name,
 	}).Info("Creating new repo")

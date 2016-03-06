@@ -4,6 +4,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
+	"github.com/ihsw/the-matrix/app/Repo"
+	"github.com/ihsw/the-matrix/app/Resource"
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Work"
 	"github.com/stretchr/testify/assert"
@@ -11,10 +13,6 @@ import (
 	"runtime"
 	"testing"
 )
-
-func fail(t *testing.T, err error) {
-	assert.Equal(t, err.Error(), nil)
-}
 
 func init() {
 	logLevel := log.WarnLevel
@@ -36,16 +34,11 @@ func TestTestSuite(t *testing.T) {
 	// misc
 	gitFormat := "https://github.com/ihsw/%s.git"
 
-	// gathering up a list of clients
-	clientRepoNames := []string{
-		"integration-nation",
+	// gathering up a list of resources
+	resourceNames := map[string]string{
+		"db": "Db",
 	}
-	clients, err := Client.NewClients(
-		clientRepoNames,
-		gitFormat,
-		"./client-repos",
-		simpleDocker,
-	)
+	resources, err := Resource.NewResources(simpleDocker, resourceNames)
 	if err != nil {
 		fail(t, err)
 		return
@@ -61,20 +54,34 @@ func TestTestSuite(t *testing.T) {
 		"crazy-train",
 		"fur-elise",
 	}
-	endpoints, err := Endpoint.NewEndpoints(
-		endpointRepoNames,
-		gitFormat,
-		"./endpoint-repos",
-		simpleDocker,
-	)
+	endpointRepos, err := Repo.NewRepos(endpointRepoNames, gitFormat, "./endpoint-repos", simpleDocker)
 	if err != nil {
 		fail(t, err)
 		return
+	}
+	endpoints, err := Endpoint.NewEndpoints(endpointRepos, resources)
+
+	// gathering up a list of clients
+	clientRepoNames := []string{
+		"integration-nation",
+	}
+	clientRepos, err := Repo.NewRepos(clientRepoNames, gitFormat, "./client-repos", simpleDocker)
+	if err != nil {
+		fail(t, err)
+		return
+	}
+	clients, err := Client.NewClients(clientRepos)
+	if err != nil {
+		fail(t, err)
 	}
 
-	err = Work.RunEndpoints(endpoints, clients)
+	err = Work.RunEndpoints(endpoints, resources, clients)
 	if err != nil {
 		fail(t, err)
 		return
 	}
+}
+
+func fail(t *testing.T, err error) {
+	assert.Equal(t, err.Error(), nil)
 }

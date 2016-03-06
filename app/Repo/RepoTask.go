@@ -17,7 +17,7 @@ func NewRepos(names []string, gitFormat string, cloneDirectory string, simpleDoc
 	out := make(chan repoTask)
 	worker := func() {
 		for name := range in {
-			repo, err := NewRepo(
+			repo, err := newRepo(
 				name,
 				gitFormat,
 				cloneDirectory,

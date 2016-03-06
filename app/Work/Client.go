@@ -1,7 +1,10 @@
 package Work
 
 import (
+	"errors"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
 	"github.com/ihsw/the-matrix/app/Util"
@@ -47,12 +50,12 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 			continue
 		}
 
-		lastError = task.err
 		log.WithFields(log.Fields{
 			"endpoint": task.endpoint.Repo.Name,
 			"client":   task.client.Repo.Name,
 			"err":      task.err.Error(),
 		}).Warn("Client run failed")
+		lastError = task.err
 
 		if task.testOutput != nil {
 			for _, line := range task.testOutput.Results {
@@ -69,48 +72,47 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 	return lastError
 }
 
-type endpointWorkTask struct {
-	endpoint Endpoint.Endpoint
-	err      error
+func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error) {
+	log.WithFields(log.Fields{
+		"endpoint": e.Name,
+		"client":   c.Name,
+	}).Info("Running client")
+
+	container, err := c.SimpleDocker.CreateContainer(
+		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
+		fmt.Sprintf("ihsw/%s", c.Name),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	failed, err := c.SimpleDocker.RunContainer(container, []string{fmt.Sprintf("%s:ApiServer", e.Container.ID)})
+	if err != nil {
+		return nil, err
+	}
+
+	containerLogs, err := c.SimpleDocker.GetContainerLogs(container)
+	if err != nil {
+		return nil, err
+	}
+
+	if failed {
+		testOutput, err := Client.ParseClientLogs(containerLogs)
+		if err != nil {
+			return nil, errors.New("Client logs could not be parsed")
+		}
+
+		return testOutput, cleanClient(c, container, errors.New("Test container exited with non-zero status"))
+	}
+
+	return nil, cleanClient(c, container, nil)
 }
 
-// RunEndpoints - runs clients against endpoints
-func RunEndpoints(endpoints []Endpoint.Endpoint, clients []Client.Client) error {
-	// setting up the workers
-	in := make(chan Endpoint.Endpoint)
-	out := make(chan endpointWorkTask)
-	worker := func() {
-		for endpoint := range in {
-			err := runEndpoint(endpoint, clients)
-			out <- endpointWorkTask{
-				endpoint: endpoint,
-				err:      err,
-			}
-		}
-	}
-	postWork := func() { close(out) }
-	Util.Work(len(endpoints), worker, postWork)
-
-	// starting it up
-	go func() {
-		for _, endpoint := range endpoints {
-			in <- endpoint
-		}
-		close(in)
-	}()
-
-	// waiting for it to drain out
-	var lastError error
-	for task := range out {
-		if task.err == nil {
-			continue
-		}
-
-		log.WithFields(log.Fields{
-			"endpoint": task.endpoint.Repo.Name,
-		}).Warn("Endpoint run failed")
-		lastError = task.err
+func cleanClient(c Client.Client, container *docker.Container, prevErr error) error {
+	err := c.SimpleDocker.RemoveContainer(container)
+	if err != nil {
+		return err
 	}
 
-	return lastError
+	return prevErr
 }

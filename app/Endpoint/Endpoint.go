@@ -1,74 +1,99 @@
 package Endpoint
 
 import (
+	"fmt"
+	log "github.com/Sirupsen/logrus"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/Repo"
-	"github.com/ihsw/the-matrix/app/SimpleDocker"
-	"strings"
+	"github.com/ihsw/the-matrix/app/Resource"
+	"time"
 )
 
-// Endpoint - a container ran against an Endpoint
-type Endpoint struct {
-	Repo.Repo
-}
-
-// NewEndpoint - creates a new Endpoint
-func NewEndpoint(r Repo.Repo) Endpoint {
-	return Endpoint{r}
-}
-
-// NewEndpoints - creates a list of new endpoints
-func NewEndpoints(repoNames []string, gitFormat string, cloneDirectory string, simpleDocker SimpleDocker.SimpleDocker) ([]Endpoint, error) {
-	// generating a list of new repos
-	repos, err := Repo.NewRepos(repoNames, gitFormat, cloneDirectory, simpleDocker)
-	if err != nil {
-		return []Endpoint{}, err
-	}
-
-	// generating a list of new endpoints
+// NewEndpoints - creates a new list of endpoints
+func NewEndpoints(repos []Repo.Repo, resources []Resource.Resource) ([]Endpoint, error) {
 	endpoints := []Endpoint{}
 	for _, repo := range repos {
-		endpoints = append(endpoints, NewEndpoint(repo))
+		endpoint, err := newEndpoint(repo, resources)
+		if err != nil {
+			return []Endpoint{}, err
+		}
+
+		endpoints = append(endpoints, endpoint)
 	}
 
 	return endpoints, nil
 }
 
-// Start - starts up an endpoint
-func (e Endpoint) Start() error {
-	_, err := e.RunCommand("docker-compose up -d web-test")
+func newEndpoint(repo Repo.Repo, resources []Resource.Resource) (Endpoint, error) {
+	endpoint := Endpoint{
+		Repo: repo,
+	}
+
+	var err error
+	endpoint.Container, err = getContainer(endpoint, resources)
 	if err != nil {
+		return Endpoint{}, err
+	}
+
+	return endpoint, nil
+}
+
+func getContainer(e Endpoint, resources []Resource.Resource) (*docker.Container, error) {
+	log.WithFields(log.Fields{
+		"endpoint": e.Name,
+	}).Info("Creating container")
+
+	container, err := e.SimpleDocker.CreateContainer(
+		fmt.Sprintf("%s-endpoint", e.Name),
+		fmt.Sprintf("ihsw/%s", e.Name),
+	)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"endpoint": e.Name,
+			"err":      err.Error(),
+		}).Warn("Could not create container")
+
+		return nil, err
+	}
+
+	containerLinks := []string{}
+	for _, resource := range resources {
+		containerLinks = append(
+			containerLinks,
+			fmt.Sprintf("%s:%s", resource.Container.ID, resource.EndpointTarget),
+		)
+	}
+
+	if err := e.SimpleDocker.StartContainer(container, containerLinks); err != nil {
+		log.WithFields(log.Fields{
+			"endpoint": e.Name,
+			"err":      err.Error(),
+		}).Warn("Could not start container")
+
+		return nil, err
+	}
+
+	// waiting for the container to boot up
+	time.Sleep(10 * time.Second)
+
+	return container, nil
+}
+
+// Endpoint - a container ran against an Endpoint
+type Endpoint struct {
+	Repo.Repo
+	Container *docker.Container
+}
+
+// Clean - stops and removes an Endpoint's container
+func (e Endpoint) Clean(prevErr error) error {
+	if err := e.SimpleDocker.StopContainer(e.Container); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// Stop - stops an endpoint
-func (e Endpoint) Stop() error {
-	_, err := e.RunCommand("docker-compose stop")
-	if err != nil {
+	if err := e.SimpleDocker.RemoveContainer(e.Container); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// RemoveContainers - removes containers associated with an endpoint
-func (e Endpoint) RemoveContainers() error {
-	_, err := e.RunCommand("docker-compose rm -v --force")
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// GetContainerID - gets this endpoint's container ID
-func (e Endpoint) GetContainerID() (string, error) {
-	output, err := e.RunCommand("docker-compose ps -q web-test")
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(output)), nil
+	return prevErr
 }
