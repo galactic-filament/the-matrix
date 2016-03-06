@@ -88,7 +88,7 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 
 	failed, err := c.SimpleDocker.RunContainer(container, []string{fmt.Sprintf("%s:ApiServer", e.Container.ID)})
 	if err != nil {
-		return nil, err
+		return nil, cleanClient(c, container, err)
 	}
 
 	containerLogs, err := c.SimpleDocker.GetContainerLogs(container)
