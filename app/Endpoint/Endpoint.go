@@ -9,21 +9,6 @@ import (
 	"time"
 )
 
-// NewEndpoints - creates a new list of endpoints
-func NewEndpoints(repos []Repo.Repo, resources []Resource.Resource) ([]Endpoint, error) {
-	endpoints := []Endpoint{}
-	for _, repo := range repos {
-		endpoint, err := newEndpoint(repo, resources)
-		if err != nil {
-			return []Endpoint{}, err
-		}
-
-		endpoints = append(endpoints, endpoint)
-	}
-
-	return endpoints, nil
-}
-
 func newEndpoint(repo Repo.Repo, resources []Resource.Resource) (Endpoint, error) {
 	endpoint := Endpoint{
 		Repo: repo,
