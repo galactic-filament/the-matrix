@@ -28,8 +28,7 @@ func newRepo(name string, gitFormat string, cloneDirectory string, simpleDocker 
 		SimpleDocker:   simpleDocker,
 	}
 
-	err := r.clone()
-	if err != nil {
+	if err := r.clone(); err != nil {
 		log.WithFields(log.Fields{
 			"name": name,
 			"err":  err.Error(),
@@ -38,7 +37,7 @@ func newRepo(name string, gitFormat string, cloneDirectory string, simpleDocker 
 		return Repo{}, err
 	}
 
-	output, err = r.buildImages()
+	output, err := r.buildImages()
 	if err != nil {
 		log.WithFields(log.Fields{
 			"name":   name,
