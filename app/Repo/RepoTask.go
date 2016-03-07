@@ -27,7 +27,7 @@ func NewRepos(names []string, gitFormat string, cloneDirectory string, simpleDoc
 		}
 	}
 	postWork := func() { close(out) }
-	Util.Work(len(names), worker, postWork)
+	Util.Work(1, worker, postWork)
 
 	// starting it up
 	go func() {
