@@ -6,7 +6,6 @@ import (
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/Repo"
 	"github.com/ihsw/the-matrix/app/Resource"
-	"os"
 	"time"
 )
 
@@ -47,7 +46,7 @@ func getContainer(e Endpoint, resources []Resource.Resource) (*docker.Container,
 	container, err := e.SimpleDocker.CreateContainer(
 		fmt.Sprintf("%s-endpoint", e.Name),
 		fmt.Sprintf("ihsw/%s", e.Name),
-		[]string{fmt.Sprintf("ENV=%s", os.Getenv("ENV"))},
+		[]string{"DATABASE_HOST=Db"},
 	)
 	if err != nil {
 		log.WithFields(log.Fields{
