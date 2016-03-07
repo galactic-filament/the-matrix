@@ -37,12 +37,10 @@ func newRepo(name string, gitFormat string, cloneDirectory string, simpleDocker 
 		return Repo{}, err
 	}
 
-	output, err := r.buildImages()
-	if err != nil {
+	if err := r.buildImages(); err != nil {
 		log.WithFields(log.Fields{
 			"name":   name,
-			"err":    err.Error(),
-			"output": output,
+			"err":    err.Error()
 		}).Warn("Build repo image failed")
 
 		return Repo{}, err
@@ -79,14 +77,13 @@ func (r Repo) RunCommand(cmd string) ([]byte, error) {
 }
 
 // BuildImages - runs the build-images command found in all repos
-func (r Repo) buildImages() (string, error) {
+func (r Repo) buildImages() error {
 	cmd := "./bin/build-images"
-	output, err := r.RunCommand(cmd)
-	if err != nil {
-		return string(output), err
+	if _, err := r.RunCommand(cmd); err != nil {
+		return err
 	}
 
-	return "", nil
+	return nil
 }
 
 // RemoveDir - removes the contents of the clone path
