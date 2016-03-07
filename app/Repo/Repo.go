@@ -40,7 +40,7 @@ func newRepo(name string, gitFormat string, cloneDirectory string, simpleDocker 
 	if err := r.buildImages(); err != nil {
 		log.WithFields(log.Fields{
 			"name":   name,
-			"err":    err.Error()
+			"err":    err.Error(),
 		}).Warn("Build repo image failed")
 
 		return Repo{}, err
