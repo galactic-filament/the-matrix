@@ -83,10 +83,10 @@ func (r Repo) buildImages() (string, error) {
 	cmd := "./bin/build-images"
 	output, err := r.RunCommand(cmd)
 	if err != nil {
-		return "", err
+		return string(output), err
 	}
 
-	return string(output), nil
+	return "", nil
 }
 
 // RemoveDir - removes the contents of the clone path
