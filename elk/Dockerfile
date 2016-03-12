@@ -20,7 +20,7 @@ RUN curl -L -O -s https://download.elastic.co/logstash/logstash/packages/debian/
 # installing kibana
 RUN curl -L -O -s https://download.elastic.co/kibana/kibana/kibana-${KIBANA_VERSION}.tar.gz \
   && mkdir /srv/kibana \
-  && tar --strip-components=1 -C /srv/kibana -xvf ./kibana-${KIBANA_VERSION}.tar.gz \
+  && tar --strip-components=1 -C /srv/kibana -xf ./kibana-${KIBANA_VERSION}.tar.gz \
   && rm ./kibana-${KIBANA_VERSION}.tar.gz
 
 CMD ["bash"]
