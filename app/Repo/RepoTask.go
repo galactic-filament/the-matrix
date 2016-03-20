@@ -11,18 +11,13 @@ type repoTask struct {
 }
 
 // NewRepos - creates a new list of repos from names
-func NewRepos(names []string, gitFormat string, cloneDirectory string, simpleDocker SimpleDocker.SimpleDocker) ([]Repo, error) {
+func NewRepos(names []string, simpleDocker SimpleDocker.SimpleDocker) ([]Repo, error) {
 	// setting up the workers
 	in := make(chan string)
 	out := make(chan repoTask)
 	worker := func() {
 		for name := range in {
-			repo, err := newRepo(
-				name,
-				gitFormat,
-				cloneDirectory,
-				simpleDocker,
-			)
+			repo, err := newRepo(name, simpleDocker)
 			out <- repoTask{repo, err}
 		}
 	}

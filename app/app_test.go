@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	logLevel := log.WarnLevel
+	logLevel := log.InfoLevel
 	if os.Getenv("ENV") == "travis" {
 		logLevel = log.InfoLevel
 	}
@@ -31,9 +31,6 @@ func TestTestSuite(t *testing.T) {
 		return
 	}
 
-	// misc
-	gitFormat := "https://github.com/ihsw/%s.git"
-
 	// gathering up a list of resources
 	resourceNames := map[string]string{
 		"db": "Db",
@@ -47,14 +44,14 @@ func TestTestSuite(t *testing.T) {
 	// gathering up a list of endpoints
 	endpointRepoNames := []string{
 		"omega-jazz",
-		"pho-sho",
-		"go-home",
-		"py-lyfe",
-		"es-bueno",
-		"crazy-train",
-		"fur-elise",
+		// "pho-sho",
+		// "go-home",
+		// "py-lyfe",
+		// "es-bueno",
+		// "crazy-train",
+		// "fur-elise",
 	}
-	endpointRepos, err := Repo.NewRepos(endpointRepoNames, gitFormat, "./endpoint-repos", simpleDocker)
+	endpointRepos, err := Repo.NewRepos(endpointRepoNames, simpleDocker)
 	if err != nil {
 		fail(t, err)
 		return
@@ -65,7 +62,7 @@ func TestTestSuite(t *testing.T) {
 	clientRepoNames := []string{
 		"integration-nation",
 	}
-	clientRepos, err := Repo.NewRepos(clientRepoNames, gitFormat, "./client-repos", simpleDocker)
+	clientRepos, err := Repo.NewRepos(clientRepoNames, simpleDocker)
 	if err != nil {
 		fail(t, err)
 		return
