@@ -5,6 +5,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Util"
+	"time"
 )
 
 // Repo - container to run tests with
@@ -23,6 +24,7 @@ func newRepo(name string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) 
 		SimpleDocker: simpleDocker,
 	}
 
+	startTime := time.Now()
 	repoName := fmt.Sprintf("ihsw/%s", name)
 	if err := r.pullImage(repoName); err != nil {
 		log.WithFields(log.Fields{
@@ -35,7 +37,8 @@ func newRepo(name string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) 
 	}
 
 	log.WithFields(log.Fields{
-		"name": name,
+		"name":     name,
+		"duration": fmt.Sprintf("%v", time.Now().Sub(startTime)),
 	}).Info("Repo create success")
 
 	return r, nil
