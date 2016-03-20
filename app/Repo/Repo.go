@@ -41,7 +41,6 @@ func newRepo(name string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) 
 	return r, nil
 }
 
-// BuildImages - runs the build-images command found in all repos
 func (r Repo) pullImage(repoName string) error {
 	cmd := fmt.Sprintf("docker pull %s", repoName)
 	if _, err := Util.RunCommand(cmd); err != nil {
