@@ -22,7 +22,7 @@ func NewRepos(names []string, simpleDocker SimpleDocker.SimpleDocker) ([]Repo, e
 		}
 	}
 	postWork := func() { close(out) }
-	Util.Work(len(names), worker, postWork)
+	Util.Work(4, worker, postWork)
 
 	// starting it up
 	go func() {
