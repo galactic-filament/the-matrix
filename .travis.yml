@@ -9,6 +9,6 @@ env:
   - ENV=travis
 before_script:
   - go vet github.com/ihsw/the-matrix/app/...
-  - ./bin/build-images
+  - docker build -t ihsw/the-matrix-db ./db
 script:
   - go test -v github.com/ihsw/the-matrix/app/...
