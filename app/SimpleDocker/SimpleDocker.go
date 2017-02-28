@@ -2,6 +2,7 @@ package SimpleDocker
 
 import (
 	"bytes"
+
 	"github.com/fsouza/go-dockerclient"
 )
 

@@ -1,6 +1,10 @@
 package main
 
 import (
+	"os"
+	"runtime"
+	"testing"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
@@ -9,9 +13,6 @@ import (
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Work"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"runtime"
-	"testing"
 )
 
 func init() {

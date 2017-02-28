@@ -3,8 +3,9 @@ package Work
 import (
 	"errors"
 	"fmt"
+
 	log "github.com/Sirupsen/logrus"
-	"github.com/fsouza/go-dockerclient"
+	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/Client"
 	"github.com/ihsw/the-matrix/app/Endpoint"
 	"github.com/ihsw/the-matrix/app/Util"
