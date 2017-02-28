@@ -102,3 +102,8 @@ func (s SimpleDocker) RemoveContainer(container *docker.Container) error {
 func (s SimpleDocker) GetContainer(id string) (*docker.Container, error) {
 	return s.client.InspectContainer(id)
 }
+
+// GetImage - fetches an image from id
+func (s SimpleDocker) GetImage(id string) (*docker.Image, error) {
+	return s.client.InspectImage(id)
+}

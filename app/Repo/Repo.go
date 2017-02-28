@@ -2,10 +2,11 @@ package Repo
 
 import (
 	"fmt"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
 	"github.com/ihsw/the-matrix/app/Util"
-	"time"
 )
 
 // Repo - container to run tests with
@@ -15,22 +16,24 @@ type Repo struct {
 }
 
 func newRepo(name string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) {
-	log.WithFields(log.Fields{
-		"name": name,
-	}).Info("Creating new repo")
-
+	imageID := fmt.Sprintf("ihsw/%s", name)
 	r := Repo{
 		Name:         name,
 		SimpleDocker: simpleDocker,
 	}
+	if _, err := simpleDocker.GetImage(imageID); err == nil {
+		return r, nil
+	}
 
+	log.WithFields(log.Fields{
+		"name": name,
+	}).Info("Creating new repo")
 	startTime := time.Now()
-	repoName := fmt.Sprintf("ihsw/%s", name)
-	if err := r.pullImage(repoName); err != nil {
+	if err := r.pullImage(imageID); err != nil {
 		log.WithFields(log.Fields{
 			"name":     name,
 			"err":      err.Error(),
-			"repoName": repoName,
+			"repoName": imageID,
 		}).Warn("Could not pull image")
 
 		return Repo{}, err
