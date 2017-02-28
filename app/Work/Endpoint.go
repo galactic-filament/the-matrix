@@ -53,14 +53,14 @@ func RunEndpoints(endpoints []Endpoint.Endpoint, resources []Resource.Resource, 
 	}
 
 	// cleaning the resources
-	for _, resource := range resources {
-		err := resource.Clean()
-		if err == nil {
-			continue
-		}
+	// for _, resource := range resources {
+	// 	err := resource.Clean()
+	// 	if err == nil {
+	// 		continue
+	// 	}
 
-		lastError = err
-	}
+	// 	lastError = err
+	// }
 
 	return lastError
 }
@@ -71,8 +71,10 @@ func runEndpoint(e Endpoint.Endpoint, resources []Resource.Resource, clients []C
 	}).Info("Running endpoint")
 
 	if err := runClients(e, clients); err != nil {
-		return e.Clean(err)
+		return err
+		// return e.Clean(err)
 	}
 
-	return e.Clean(nil)
+	return nil
+	// return e.Clean(nil)
 }

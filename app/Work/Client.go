@@ -79,21 +79,24 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 		"client":   c.Name,
 	}).Info("Running client")
 
-	container, err := c.SimpleDocker.CreateContainer(
+	endpointHostname := "ApiServer"
+	clientContainer, err := c.SimpleDocker.CreateContainer(
 		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
 		fmt.Sprintf("ihsw/%s", c.Name),
-		[]string{},
+		[]string{fmt.Sprintf("API_HOST=%s", endpointHostname)},
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	failed, err := c.SimpleDocker.RunContainer(container, []string{fmt.Sprintf("%s:ApiServer", e.Container.ID)})
+	failed, err := c.SimpleDocker.RunContainer(clientContainer, []string{
+		fmt.Sprintf("%s:%s", e.Container.ID, endpointHostname),
+	})
 	if err != nil {
-		return nil, cleanClient(c, container, err)
+		return nil, cleanClient(c, clientContainer, err)
 	}
 
-	containerLogs, err := c.SimpleDocker.GetContainerLogs(container)
+	containerLogs, err := c.SimpleDocker.GetContainerLogs(clientContainer)
 	if err != nil {
 		return nil, err
 	}
@@ -104,17 +107,18 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 			return nil, errors.New("Client logs could not be parsed")
 		}
 
-		return testOutput, cleanClient(c, container, errors.New("Test container exited with non-zero status"))
+		return testOutput, cleanClient(c, clientContainer, errors.New("Test container exited with non-zero status"))
 	}
 
-	return nil, cleanClient(c, container, nil)
+	return nil, cleanClient(c, clientContainer, nil)
 }
 
 func cleanClient(c Client.Client, container *docker.Container, prevErr error) error {
-	err := c.SimpleDocker.RemoveContainer(container)
-	if err != nil {
-		return err
-	}
-
 	return prevErr
+	// err := c.SimpleDocker.RemoveContainer(container)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// return prevErr
 }

@@ -44,13 +44,13 @@ func TestTestSuite(t *testing.T) {
 
 	// gathering up a list of endpoints
 	endpointRepoNames := []string{
-		"omega-jazz",
-		"pho-sho",
-		"go-home",
+		// "omega-jazz",
+		// "pho-sho",
+		// "go-home",
 		"py-lyfe",
-		"es-bueno",
-		"crazy-train",
-		"fur-elise",
+		// "es-bueno",
+		// "crazy-train",
+		// "fur-elise",
 	}
 	endpointRepos, err := Repo.NewRepos(endpointRepoNames, simpleDocker)
 	if err != nil {

@@ -2,11 +2,12 @@ package Endpoint
 
 import (
 	"fmt"
+	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/Repo"
 	"github.com/ihsw/the-matrix/app/Resource"
-	"time"
 )
 
 func newEndpoint(repo Repo.Repo, resources []Resource.Resource) (Endpoint, error) {
