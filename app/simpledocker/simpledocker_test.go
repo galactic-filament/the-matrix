@@ -25,7 +25,7 @@ func TestListImages(t *testing.T) {
 	}
 }
 
-func TestNewSimpleDocker(t *testing.T) {
+func TestNewClient(t *testing.T) {
 	client, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Errorf("Could not create a new docker client: %s", err.Error())

@@ -9,17 +9,17 @@ import (
 
 // Client - simplified interface to the docker client
 type Client struct {
-	client *docker.Client
+	dockerClient *docker.Client
 }
 
 // NewClient - creates a new SimpleDocker
 func NewClient(dockerClient *docker.Client) Client {
-	return Client{client: dockerClient}
+	return Client{dockerClient: dockerClient}
 }
 
 // CreateContainer - creates a container but doesn't start it up
 func (c Client) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
-	container, err := c.client.CreateContainer(docker.CreateContainerOptions{
+	container, err := c.dockerClient.CreateContainer(docker.CreateContainerOptions{
 		Name: name,
 		Config: &docker.Config{
 			Image: image,
@@ -36,7 +36,7 @@ func (c Client) CreateContainer(name string, image string, envVars []string) (*d
 // GetContainerLogs - fetches the logs for a given container
 func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 	var output bytes.Buffer
-	err := c.client.Logs(docker.LogsOptions{
+	err := c.dockerClient.Logs(docker.LogsOptions{
 		Container:    container.ID,
 		Stdout:       true,
 		OutputStream: &output,
@@ -55,7 +55,7 @@ func (c Client) StartContainer(container *docker.Container, links []string) erro
 		"links":     links,
 	}).Info("Starting container with links")
 
-	err := c.client.StartContainer(container.ID, &docker.HostConfig{Links: links})
+	err := c.dockerClient.StartContainer(container.ID, &docker.HostConfig{Links: links})
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (c Client) RunContainer(container *docker.Container, links []string) (bool,
 		return false, err
 	}
 
-	status, err := c.client.WaitContainer(container.ID)
+	status, err := c.dockerClient.WaitContainer(container.ID)
 	if err != nil {
 		return false, err
 	}
@@ -83,12 +83,12 @@ func (c Client) RunContainer(container *docker.Container, links []string) (bool,
 
 // StopContainer - stops a container
 func (c Client) StopContainer(container *docker.Container) error {
-	return c.client.StopContainer(container.ID, 10)
+	return c.dockerClient.StopContainer(container.ID, 10)
 }
 
 // RemoveContainer - removes a container
 func (c Client) RemoveContainer(container *docker.Container) error {
-	err := c.client.RemoveContainer(docker.RemoveContainerOptions{
+	err := c.dockerClient.RemoveContainer(docker.RemoveContainerOptions{
 		ID:            container.ID,
 		RemoveVolumes: true,
 	})
@@ -101,10 +101,10 @@ func (c Client) RemoveContainer(container *docker.Container) error {
 
 // GetContainer - fetches a container from id
 func (c Client) GetContainer(id string) (*docker.Container, error) {
-	return c.client.InspectContainer(id)
+	return c.dockerClient.InspectContainer(id)
 }
 
 // GetImage - fetches an image from id
 func (c Client) GetImage(id string) (*docker.Image, error) {
-	return c.client.InspectImage(id)
+	return c.dockerClient.InspectImage(id)
 }
