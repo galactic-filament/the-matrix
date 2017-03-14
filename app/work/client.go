@@ -1,4 +1,4 @@
-package Work
+package work
 
 import (
 	"errors"

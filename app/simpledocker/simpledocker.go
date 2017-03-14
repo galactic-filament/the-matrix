@@ -1,4 +1,4 @@
-package SimpleDocker
+package simpledocker
 
 import (
 	"bytes"

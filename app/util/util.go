@@ -1,9 +1,10 @@
-package Util
+package util
 
 import (
-	log "github.com/Sirupsen/logrus"
 	"os/exec"
 	"sync"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // RunCommand - runs a shell command

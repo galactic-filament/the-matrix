@@ -1,9 +1,8 @@
-package Endpoint
+package endpoint
 
 import (
 	"github.com/ihsw/the-matrix/app/Repo"
 	"github.com/ihsw/the-matrix/app/Resource"
-	"github.com/ihsw/the-matrix/app/Util"
 )
 
 type endpointTask struct {

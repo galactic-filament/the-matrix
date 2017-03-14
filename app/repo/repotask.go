@@ -1,8 +1,7 @@
-package Repo
+package repo
 
 import (
 	"github.com/ihsw/the-matrix/app/SimpleDocker"
-	"github.com/ihsw/the-matrix/app/Util"
 )
 
 type repoTask struct {

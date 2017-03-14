@@ -1,11 +1,7 @@
-package Work
+package work
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ihsw/the-matrix/app/Client"
-	"github.com/ihsw/the-matrix/app/Endpoint"
-	"github.com/ihsw/the-matrix/app/Resource"
-	"github.com/ihsw/the-matrix/app/Util"
 )
 
 type endpointWorkTask struct {

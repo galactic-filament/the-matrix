@@ -1,4 +1,4 @@
-package Client
+package client
 
 import (
 	"github.com/ihsw/the-matrix/app/Repo"
