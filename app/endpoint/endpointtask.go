@@ -1,8 +1,9 @@
 package endpoint
 
 import (
-	"github.com/ihsw/the-matrix/app/Repo"
-	"github.com/ihsw/the-matrix/app/Resource"
+	"github.com/ihsw/the-matrix/app/repo"
+	"github.com/ihsw/the-matrix/app/resource"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 type endpointTask struct {
@@ -11,9 +12,9 @@ type endpointTask struct {
 }
 
 // NewEndpoints - creates a new list of endpoints
-func NewEndpoints(repos []Repo.Repo, resources []Resource.Resource) ([]Endpoint, error) {
+func NewEndpoints(repos []repo.Repo, resources []resource.Resource) ([]Endpoint, error) {
 	// setting up the workers
-	in := make(chan Repo.Repo)
+	in := make(chan repo.Repo)
 	out := make(chan endpointTask)
 	worker := func() {
 		for repo := range in {
@@ -22,7 +23,7 @@ func NewEndpoints(repos []Repo.Repo, resources []Resource.Resource) ([]Endpoint,
 		}
 	}
 	postWork := func() { close(out) }
-	Util.Work(len(repos), worker, postWork)
+	util.Work(len(repos), worker, postWork)
 
 	// starting it up
 	go func() {

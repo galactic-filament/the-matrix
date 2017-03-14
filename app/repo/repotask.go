@@ -1,7 +1,8 @@
 package repo
 
 import (
-	"github.com/ihsw/the-matrix/app/SimpleDocker"
+	"github.com/ihsw/the-matrix/app/simpledocker"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 type repoTask struct {
@@ -10,7 +11,7 @@ type repoTask struct {
 }
 
 // NewRepos - creates a new list of repos from names
-func NewRepos(names []string, simpleDocker SimpleDocker.SimpleDocker) ([]Repo, error) {
+func NewRepos(names []string, simpleDocker simpledocker.SimpleDocker) ([]Repo, error) {
 	// setting up the workers
 	in := make(chan string)
 	out := make(chan repoTask)
@@ -21,7 +22,7 @@ func NewRepos(names []string, simpleDocker SimpleDocker.SimpleDocker) ([]Repo, e
 		}
 	}
 	postWork := func() { close(out) }
-	Util.Work(4, worker, postWork)
+	util.Work(4, worker, postWork)
 
 	// starting it up
 	go func() {

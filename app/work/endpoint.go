@@ -2,17 +2,21 @@ package work
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/ihsw/the-matrix/app/client"
+	"github.com/ihsw/the-matrix/app/endpoint"
+	"github.com/ihsw/the-matrix/app/resource"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 type endpointWorkTask struct {
-	endpoint Endpoint.Endpoint
+	endpoint endpoint.Endpoint
 	err      error
 }
 
 // RunEndpoints - runs clients against endpoints
-func RunEndpoints(endpoints []Endpoint.Endpoint, resources []Resource.Resource, clients []Client.Client) error {
+func RunEndpoints(endpoints []endpoint.Endpoint, resources []resource.Resource, clients []client.Client) error {
 	// setting up the workers
-	in := make(chan Endpoint.Endpoint)
+	in := make(chan endpoint.Endpoint)
 	out := make(chan endpointWorkTask)
 	worker := func() {
 		for endpoint := range in {
@@ -24,7 +28,7 @@ func RunEndpoints(endpoints []Endpoint.Endpoint, resources []Resource.Resource, 
 		}
 	}
 	postWork := func() { close(out) }
-	Util.Work(len(endpoints), worker, postWork)
+	util.Work(len(endpoints), worker, postWork)
 
 	// starting it up
 	go func() {
@@ -61,7 +65,7 @@ func RunEndpoints(endpoints []Endpoint.Endpoint, resources []Resource.Resource, 
 	return lastError
 }
 
-func runEndpoint(e Endpoint.Endpoint, resources []Resource.Resource, clients []Client.Client) error {
+func runEndpoint(e endpoint.Endpoint, resources []resource.Resource, clients []client.Client) error {
 	log.WithFields(log.Fields{
 		"endpoint": e.Name,
 	}).Info("Running endpoint")

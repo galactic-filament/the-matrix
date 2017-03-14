@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/ihsw/the-matrix/app/Client"
-	"github.com/ihsw/the-matrix/app/Endpoint"
-	"github.com/ihsw/the-matrix/app/Repo"
-	"github.com/ihsw/the-matrix/app/Resource"
-	"github.com/ihsw/the-matrix/app/SimpleDocker"
-	"github.com/ihsw/the-matrix/app/Work"
+	"github.com/ihsw/the-matrix/app/client"
+	"github.com/ihsw/the-matrix/app/endpoint"
+	"github.com/ihsw/the-matrix/app/repo"
+	"github.com/ihsw/the-matrix/app/resource"
+	"github.com/ihsw/the-matrix/app/simpledocker"
+	"github.com/ihsw/the-matrix/app/work"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +26,7 @@ func init() {
 
 func TestTestSuite(t *testing.T) {
 	// connecting to docker
-	simpleDocker, err := SimpleDocker.NewSimpleDocker("unix:///var/run/docker.sock")
+	simpleDocker, err := simpledocker.NewSimpleDocker("unix:///var/run/docker.sock")
 	if err != nil {
 		fail(t, err)
 		return
@@ -36,7 +36,7 @@ func TestTestSuite(t *testing.T) {
 	resourceNames := map[string]string{
 		"db": "Db",
 	}
-	resources, err := Resource.NewResources(simpleDocker, resourceNames)
+	resources, err := resource.NewResources(simpleDocker, resourceNames)
 	if err != nil {
 		fail(t, err)
 		return
@@ -52,28 +52,28 @@ func TestTestSuite(t *testing.T) {
 		// "crazy-train",
 		// "fur-elise",
 	}
-	endpointRepos, err := Repo.NewRepos(endpointRepoNames, simpleDocker)
+	endpointRepos, err := repo.NewRepos(endpointRepoNames, simpleDocker)
 	if err != nil {
 		fail(t, err)
 		return
 	}
-	endpoints, err := Endpoint.NewEndpoints(endpointRepos, resources)
+	endpoints, err := endpoint.NewEndpoints(endpointRepos, resources)
 
 	// gathering up a list of clients
 	clientRepoNames := []string{
 		"integration-nation",
 	}
-	clientRepos, err := Repo.NewRepos(clientRepoNames, simpleDocker)
+	clientRepos, err := repo.NewRepos(clientRepoNames, simpleDocker)
 	if err != nil {
 		fail(t, err)
 		return
 	}
-	clients, err := Client.NewClients(clientRepos)
+	clients, err := client.NewClients(clientRepos)
 	if err != nil {
 		fail(t, err)
 	}
 
-	err = Work.RunEndpoints(endpoints, resources, clients)
+	err = work.RunEndpoints(endpoints, resources, clients)
 	if err != nil {
 		fail(t, err)
 		return

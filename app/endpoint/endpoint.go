@@ -6,11 +6,11 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/Repo"
-	"github.com/ihsw/the-matrix/app/Resource"
+	"github.com/ihsw/the-matrix/app/repo"
+	"github.com/ihsw/the-matrix/app/resource"
 )
 
-func newEndpoint(repo Repo.Repo, resources []Resource.Resource) (Endpoint, error) {
+func newEndpoint(repo repo.Repo, resources []resource.Resource) (Endpoint, error) {
 	endpoint := Endpoint{
 		Repo: repo,
 	}
@@ -24,7 +24,7 @@ func newEndpoint(repo Repo.Repo, resources []Resource.Resource) (Endpoint, error
 	return endpoint, nil
 }
 
-func getContainer(e Endpoint, resources []Resource.Resource) (*docker.Container, error) {
+func getContainer(e Endpoint, resources []resource.Resource) (*docker.Container, error) {
 	log.WithFields(log.Fields{
 		"endpoint": e.Name,
 	}).Info("Creating endpoint container")
@@ -68,7 +68,7 @@ func getContainer(e Endpoint, resources []Resource.Resource) (*docker.Container,
 
 // Endpoint - a container ran against an Endpoint
 type Endpoint struct {
-	Repo.Repo
+	repo.Repo
 	Container *docker.Container
 }
 

@@ -6,21 +6,21 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/Client"
-	"github.com/ihsw/the-matrix/app/Endpoint"
-	"github.com/ihsw/the-matrix/app/Util"
+	"github.com/ihsw/the-matrix/app/client"
+	"github.com/ihsw/the-matrix/app/endpoint"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 type clientWorkTask struct {
-	endpoint   Endpoint.Endpoint
-	client     Client.Client
-	testOutput *Client.TestOutput
+	endpoint   endpoint.Endpoint
+	client     client.Client
+	testOutput *client.TestOutput
 	err        error
 }
 
-func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
+func runClients(endpoint endpoint.Endpoint, clients []client.Client) error {
 	// setting up the workers
-	in := make(chan Client.Client)
+	in := make(chan client.Client)
 	out := make(chan clientWorkTask)
 	worker := func() {
 		for client := range in {
@@ -34,7 +34,7 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 		}
 	}
 	postWork := func() { close(out) }
-	Util.Work(len(clients), worker, postWork)
+	util.Work(len(clients), worker, postWork)
 
 	// starting it up
 	go func() {
@@ -73,7 +73,7 @@ func runClients(endpoint Endpoint.Endpoint, clients []Client.Client) error {
 	return lastError
 }
 
-func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error) {
+func runClient(c client.Client, e endpoint.Endpoint) (*client.TestOutput, error) {
 	log.WithFields(log.Fields{
 		"endpoint": e.Name,
 		"client":   c.Name,
@@ -102,7 +102,7 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 	}
 
 	if failed {
-		testOutput, err := Client.ParseClientLogs(containerLogs)
+		testOutput, err := client.ParseClientLogs(containerLogs)
 		if err != nil {
 			return nil, errors.New("Client logs could not be parsed")
 		}
@@ -113,7 +113,7 @@ func runClient(c Client.Client, e Endpoint.Endpoint) (*Client.TestOutput, error)
 	return nil, cleanClient(c, clientContainer, nil)
 }
 
-func cleanClient(c Client.Client, container *docker.Container, prevErr error) error {
+func cleanClient(c client.Client, container *docker.Container, prevErr error) error {
 	return prevErr
 	// err := c.SimpleDocker.RemoveContainer(container)
 	// if err != nil {

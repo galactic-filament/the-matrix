@@ -5,17 +5,17 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/ihsw/the-matrix/app/SimpleDocker"
-	"github.com/ihsw/the-matrix/app/Util"
+	"github.com/ihsw/the-matrix/app/simpledocker"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 // Repo - container to run tests with
 type Repo struct {
 	Name         string
-	SimpleDocker SimpleDocker.SimpleDocker
+	SimpleDocker simpledocker.SimpleDocker
 }
 
-func newRepo(name string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) {
+func newRepo(name string, simpleDocker simpledocker.SimpleDocker) (Repo, error) {
 	imageID := fmt.Sprintf("ihsw/%s", name)
 	r := Repo{
 		Name:         name,
@@ -49,7 +49,7 @@ func newRepo(name string, simpleDocker SimpleDocker.SimpleDocker) (Repo, error) 
 
 func (r Repo) pullImage(repoName string) error {
 	cmd := fmt.Sprintf("docker pull %s", repoName)
-	if _, err := Util.RunCommand(cmd); err != nil {
+	if _, err := util.RunCommand(cmd); err != nil {
 		return err
 	}
 

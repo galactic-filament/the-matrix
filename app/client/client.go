@@ -1,11 +1,9 @@
 package client
 
-import (
-	"github.com/ihsw/the-matrix/app/Repo"
-)
+import "github.com/ihsw/the-matrix/app/repo"
 
 // NewClients - creates a list of new clients
-func NewClients(repos []Repo.Repo) ([]Client, error) {
+func NewClients(repos []repo.Repo) ([]Client, error) {
 	clients := []Client{}
 	for _, repo := range repos {
 		clients = append(clients, newClient(repo))
@@ -14,11 +12,11 @@ func NewClients(repos []Repo.Repo) ([]Client, error) {
 	return clients, nil
 }
 
-func newClient(r Repo.Repo) Client {
+func newClient(r repo.Repo) Client {
 	return Client{r}
 }
 
 // Client - a container ran against an Endpoint
 type Client struct {
-	Repo.Repo
+	repo.Repo
 }
