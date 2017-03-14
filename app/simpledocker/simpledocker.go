@@ -13,13 +13,8 @@ type SimpleDocker struct {
 }
 
 // NewSimpleDocker - creates a new SimpleDocker
-func NewSimpleDocker(endpoint string) (SimpleDocker, error) {
-	client, err := docker.NewClient("unix:///var/run/docker.sock")
-	if err != nil {
-		return SimpleDocker{}, err
-	}
-
-	return SimpleDocker{client: client}, nil
+func NewSimpleDocker(dockerClient *docker.Client) SimpleDocker {
+	return SimpleDocker{client: dockerClient}
 }
 
 // CreateContainer - creates a container but doesn't start it up
