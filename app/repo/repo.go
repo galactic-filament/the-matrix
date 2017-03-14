@@ -12,10 +12,10 @@ import (
 // Repo - container to run tests with
 type Repo struct {
 	Name         string
-	SimpleDocker simpledocker.SimpleDocker
+	SimpleDocker simpledocker.Client
 }
 
-func newRepo(name string, simpleDocker simpledocker.SimpleDocker) (Repo, error) {
+func newRepo(name string, simpleDocker simpledocker.Client) (Repo, error) {
 	imageID := fmt.Sprintf("ihsw/%s", name)
 	r := Repo{
 		Name:         name,

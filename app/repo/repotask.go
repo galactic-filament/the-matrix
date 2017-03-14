@@ -11,7 +11,7 @@ type repoTask struct {
 }
 
 // NewRepos - creates a new list of repos from names
-func NewRepos(names []string, simpleDocker simpledocker.SimpleDocker) ([]Repo, error) {
+func NewRepos(names []string, simpleDocker simpledocker.Client) ([]Repo, error) {
 	// setting up the workers
 	in := make(chan string)
 	out := make(chan repoTask)

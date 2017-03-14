@@ -9,7 +9,7 @@ import (
 )
 
 // NewResources - generates a new list of resources
-func NewResources(simpleDocker simpledocker.SimpleDocker, names map[string]string) ([]Resource, error) {
+func NewResources(simpleDocker simpledocker.Client, names map[string]string) ([]Resource, error) {
 	resources := []Resource{}
 	for name, endpointTarget := range names {
 		resource, err := newResource(name, endpointTarget, simpleDocker)
@@ -23,7 +23,7 @@ func NewResources(simpleDocker simpledocker.SimpleDocker, names map[string]strin
 	return resources, nil
 }
 
-func newResource(name string, endpointTarget string, simpleDocker simpledocker.SimpleDocker) (Resource, error) {
+func newResource(name string, endpointTarget string, simpleDocker simpledocker.Client) (Resource, error) {
 	resource := Resource{
 		Name:           name,
 		EndpointTarget: endpointTarget,
@@ -69,7 +69,7 @@ func getContainer(r Resource) (*docker.Container, error) {
 type Resource struct {
 	Name           string
 	EndpointTarget string
-	simpleDocker   simpledocker.SimpleDocker
+	simpleDocker   simpledocker.Client
 	Container      *docker.Container
 }
 

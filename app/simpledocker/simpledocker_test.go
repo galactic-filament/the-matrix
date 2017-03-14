@@ -31,5 +31,5 @@ func TestNewSimpleDocker(t *testing.T) {
 		t.Errorf("Could not create a new docker client: %s", err.Error())
 	}
 
-	_ = NewSimpleDocker(client)
+	_ = NewClient(client)
 }

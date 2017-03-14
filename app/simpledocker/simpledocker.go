@@ -7,18 +7,18 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
-// SimpleDocker - simplified interface to the docker client
-type SimpleDocker struct {
+// Client - simplified interface to the docker client
+type Client struct {
 	client *docker.Client
 }
 
-// NewSimpleDocker - creates a new SimpleDocker
-func NewSimpleDocker(dockerClient *docker.Client) SimpleDocker {
-	return SimpleDocker{client: dockerClient}
+// NewClient - creates a new SimpleDocker
+func NewClient(dockerClient *docker.Client) Client {
+	return Client{client: dockerClient}
 }
 
 // CreateContainer - creates a container but doesn't start it up
-func (s SimpleDocker) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
+func (s Client) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
 	container, err := s.client.CreateContainer(docker.CreateContainerOptions{
 		Name: name,
 		Config: &docker.Config{
@@ -34,7 +34,7 @@ func (s SimpleDocker) CreateContainer(name string, image string, envVars []strin
 }
 
 // GetContainerLogs - fetches the logs for a given container
-func (s SimpleDocker) GetContainerLogs(container *docker.Container) (string, error) {
+func (s Client) GetContainerLogs(container *docker.Container) (string, error) {
 	var output bytes.Buffer
 	err := s.client.Logs(docker.LogsOptions{
 		Container:    container.ID,
@@ -49,7 +49,7 @@ func (s SimpleDocker) GetContainerLogs(container *docker.Container) (string, err
 }
 
 // StartContainer - starts a container up
-func (s SimpleDocker) StartContainer(container *docker.Container, links []string) error {
+func (s Client) StartContainer(container *docker.Container, links []string) error {
 	log.WithFields(log.Fields{
 		"container": container.Name,
 		"links":     links,
@@ -64,7 +64,7 @@ func (s SimpleDocker) StartContainer(container *docker.Container, links []string
 }
 
 // RunContainer - starts a container with links and waits for it to exit
-func (s SimpleDocker) RunContainer(container *docker.Container, links []string) (bool, error) {
+func (s Client) RunContainer(container *docker.Container, links []string) (bool, error) {
 	err := s.StartContainer(container, links)
 	if err != nil {
 		return false, err
@@ -82,12 +82,12 @@ func (s SimpleDocker) RunContainer(container *docker.Container, links []string) 
 }
 
 // StopContainer - stops a container
-func (s SimpleDocker) StopContainer(container *docker.Container) error {
+func (s Client) StopContainer(container *docker.Container) error {
 	return s.client.StopContainer(container.ID, 10)
 }
 
 // RemoveContainer - removes a container
-func (s SimpleDocker) RemoveContainer(container *docker.Container) error {
+func (s Client) RemoveContainer(container *docker.Container) error {
 	err := s.client.RemoveContainer(docker.RemoveContainerOptions{
 		ID:            container.ID,
 		RemoveVolumes: true,
@@ -100,11 +100,11 @@ func (s SimpleDocker) RemoveContainer(container *docker.Container) error {
 }
 
 // GetContainer - fetches a container from id
-func (s SimpleDocker) GetContainer(id string) (*docker.Container, error) {
+func (s Client) GetContainer(id string) (*docker.Container, error) {
 	return s.client.InspectContainer(id)
 }
 
 // GetImage - fetches an image from id
-func (s SimpleDocker) GetImage(id string) (*docker.Image, error) {
+func (s Client) GetImage(id string) (*docker.Image, error) {
 	return s.client.InspectImage(id)
 }
