@@ -29,7 +29,7 @@ func getContainer(e Endpoint, resources []resource.Resource) (*docker.Container,
 		"endpoint": e.Name,
 	}).Info("Creating endpoint container")
 
-	container, err := e.SimpleDocker.CreateContainer(
+	container, err := e.Client.CreateContainer(
 		fmt.Sprintf("%s-endpoint", e.Name),
 		fmt.Sprintf("ihsw/%s", e.Name),
 		[]string{"DATABASE_HOST=Db"},
@@ -51,7 +51,7 @@ func getContainer(e Endpoint, resources []resource.Resource) (*docker.Container,
 		)
 	}
 
-	if err := e.SimpleDocker.StartContainer(container, containerLinks); err != nil {
+	if err := e.Client.StartContainer(container, containerLinks); err != nil {
 		log.WithFields(log.Fields{
 			"endpoint": e.Name,
 			"err":      err.Error(),
@@ -74,11 +74,11 @@ type Endpoint struct {
 
 // Clean - stops and removes an Endpoint's container
 func (e Endpoint) Clean(prevErr error) error {
-	if err := e.SimpleDocker.StopContainer(e.Container); err != nil {
+	if err := e.Client.StopContainer(e.Container); err != nil {
 		return err
 	}
 
-	if err := e.SimpleDocker.RemoveContainer(e.Container); err != nil {
+	if err := e.Client.RemoveContainer(e.Container); err != nil {
 		return err
 	}
 

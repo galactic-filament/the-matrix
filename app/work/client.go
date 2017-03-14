@@ -80,7 +80,7 @@ func runClient(c client.Client, e endpoint.Endpoint) (*client.TestOutput, error)
 	}).Info("Running client")
 
 	endpointHostname := "ApiServer"
-	clientContainer, err := c.SimpleDocker.CreateContainer(
+	clientContainer, err := c.Client.CreateContainer(
 		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
 		fmt.Sprintf("ihsw/%s", c.Name),
 		[]string{fmt.Sprintf("API_HOST=%s", endpointHostname)},
@@ -89,14 +89,14 @@ func runClient(c client.Client, e endpoint.Endpoint) (*client.TestOutput, error)
 		return nil, err
 	}
 
-	failed, err := c.SimpleDocker.RunContainer(clientContainer, []string{
+	failed, err := c.Client.RunContainer(clientContainer, []string{
 		fmt.Sprintf("%s:%s", e.Container.ID, endpointHostname),
 	})
 	if err != nil {
 		return nil, cleanClient(c, clientContainer, err)
 	}
 
-	containerLogs, err := c.SimpleDocker.GetContainerLogs(clientContainer)
+	containerLogs, err := c.Client.GetContainerLogs(clientContainer)
 	if err != nil {
 		return nil, err
 	}

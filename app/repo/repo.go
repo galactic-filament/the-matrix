@@ -11,15 +11,15 @@ import (
 
 // Repo - container to run tests with
 type Repo struct {
-	Name         string
-	SimpleDocker simpledocker.Client
+	Name   string
+	Client simpledocker.Client
 }
 
 func newRepo(name string, simpleDocker simpledocker.Client) (Repo, error) {
 	imageID := fmt.Sprintf("ihsw/%s", name)
 	r := Repo{
-		Name:         name,
-		SimpleDocker: simpleDocker,
+		Name:   name,
+		Client: simpleDocker,
 	}
 	if _, err := simpleDocker.GetImage(imageID); err == nil {
 		return r, nil

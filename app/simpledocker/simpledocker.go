@@ -18,8 +18,8 @@ func NewClient(dockerClient *docker.Client) Client {
 }
 
 // CreateContainer - creates a container but doesn't start it up
-func (s Client) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
-	container, err := s.client.CreateContainer(docker.CreateContainerOptions{
+func (c Client) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
+	container, err := c.client.CreateContainer(docker.CreateContainerOptions{
 		Name: name,
 		Config: &docker.Config{
 			Image: image,
@@ -34,9 +34,9 @@ func (s Client) CreateContainer(name string, image string, envVars []string) (*d
 }
 
 // GetContainerLogs - fetches the logs for a given container
-func (s Client) GetContainerLogs(container *docker.Container) (string, error) {
+func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 	var output bytes.Buffer
-	err := s.client.Logs(docker.LogsOptions{
+	err := c.client.Logs(docker.LogsOptions{
 		Container:    container.ID,
 		Stdout:       true,
 		OutputStream: &output,
@@ -49,13 +49,13 @@ func (s Client) GetContainerLogs(container *docker.Container) (string, error) {
 }
 
 // StartContainer - starts a container up
-func (s Client) StartContainer(container *docker.Container, links []string) error {
+func (c Client) StartContainer(container *docker.Container, links []string) error {
 	log.WithFields(log.Fields{
 		"container": container.Name,
 		"links":     links,
 	}).Info("Starting container with links")
 
-	err := s.client.StartContainer(container.ID, &docker.HostConfig{Links: links})
+	err := c.client.StartContainer(container.ID, &docker.HostConfig{Links: links})
 	if err != nil {
 		return err
 	}
@@ -64,13 +64,13 @@ func (s Client) StartContainer(container *docker.Container, links []string) erro
 }
 
 // RunContainer - starts a container with links and waits for it to exit
-func (s Client) RunContainer(container *docker.Container, links []string) (bool, error) {
-	err := s.StartContainer(container, links)
+func (c Client) RunContainer(container *docker.Container, links []string) (bool, error) {
+	err := c.StartContainer(container, links)
 	if err != nil {
 		return false, err
 	}
 
-	status, err := s.client.WaitContainer(container.ID)
+	status, err := c.client.WaitContainer(container.ID)
 	if err != nil {
 		return false, err
 	}
@@ -82,13 +82,13 @@ func (s Client) RunContainer(container *docker.Container, links []string) (bool,
 }
 
 // StopContainer - stops a container
-func (s Client) StopContainer(container *docker.Container) error {
-	return s.client.StopContainer(container.ID, 10)
+func (c Client) StopContainer(container *docker.Container) error {
+	return c.client.StopContainer(container.ID, 10)
 }
 
 // RemoveContainer - removes a container
-func (s Client) RemoveContainer(container *docker.Container) error {
-	err := s.client.RemoveContainer(docker.RemoveContainerOptions{
+func (c Client) RemoveContainer(container *docker.Container) error {
+	err := c.client.RemoveContainer(docker.RemoveContainerOptions{
 		ID:            container.ID,
 		RemoveVolumes: true,
 	})
@@ -100,11 +100,11 @@ func (s Client) RemoveContainer(container *docker.Container) error {
 }
 
 // GetContainer - fetches a container from id
-func (s Client) GetContainer(id string) (*docker.Container, error) {
-	return s.client.InspectContainer(id)
+func (c Client) GetContainer(id string) (*docker.Container, error) {
+	return c.client.InspectContainer(id)
 }
 
 // GetImage - fetches an image from id
-func (s Client) GetImage(id string) (*docker.Image, error) {
-	return s.client.InspectImage(id)
+func (c Client) GetImage(id string) (*docker.Image, error) {
+	return c.client.InspectImage(id)
 }
