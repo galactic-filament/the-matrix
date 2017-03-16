@@ -20,6 +20,15 @@ func getTestContainerName(prefix string) (string, error) {
 	return fmt.Sprintf("%s-%s", prefix, u4), nil
 }
 
+func createTestContainer(client Client, namePrefix string, imageName string, links []string) (*docker.Container, error) {
+	containerName, err := getTestContainerName(namePrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.CreateContainer(containerName, imageName, links)
+}
+
 func TestNewDockerClient(t *testing.T) {
 	_, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -39,15 +48,6 @@ func TestListImages(t *testing.T) {
 	}
 }
 
-func TestNewClient(t *testing.T) {
-	client, err := docker.NewClientFromEnv()
-	if err != nil {
-		t.Errorf("Could not create a new docker client: %s", err.Error())
-	}
-
-	_ = NewClient(client)
-}
-
 func TestCreateContaienr(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -56,22 +56,18 @@ func TestCreateContaienr(t *testing.T) {
 
 	client := NewClient(dockerClient)
 
-	testContainerName, err := getTestContainerName(defaultTestContainerName)
+	container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
 	if err != nil {
-		t.Errorf("Could not generate test container name: %s", err.Error())
-	}
-	container, err := client.CreateContainer(testContainerName, defaultTestImage, []string{})
-	if err != nil {
-		t.Errorf("Could not create %s container: %s", testContainerName, err.Error())
+		t.Errorf("Could not create %s container: %s", container.Name, err.Error())
 	}
 
 	err = client.RemoveContainer(container)
 	if err != nil {
-		t.Errorf("Could not remove container %s: %s", testContainerName, err.Error())
+		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 	}
 }
 
-func TestStartContaienr(t *testing.T) {
+func TestStartContainer(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Errorf("Could not create a new docker client: %s", err.Error())
@@ -79,22 +75,57 @@ func TestStartContaienr(t *testing.T) {
 
 	client := NewClient(dockerClient)
 
-	testContainerName, err := getTestContainerName(defaultTestContainerName)
+	container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
 	if err != nil {
-		t.Errorf("Could not generate test container name: %s", err.Error())
-	}
-	container, err := client.CreateContainer(testContainerName, defaultTestImage, []string{})
-	if err != nil {
-		t.Errorf("Could not create %s container: %s", testContainerName, err.Error())
+		t.Errorf("Could not create %s container: %s", container.Name, err.Error())
 	}
 
 	err = client.StartContainer(container, []string{})
 	if err != nil {
-		t.Errorf("Could not start container %s: %s", testContainerName, err.Error())
+		t.Errorf("Could not start container %s: %s", container.Name, err.Error())
+	}
+
+	_, err = dockerClient.WaitContainer(container.ID)
+	if err != nil {
+		t.Errorf("Could not wait to exit container %s: %s", container.Name, err.Error())
 	}
 
 	err = client.RemoveContainer(container)
 	if err != nil {
-		t.Errorf("Could not remove container %s: %s", testContainerName, err.Error())
+		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
+	}
+}
+
+func TestRunContainer(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+	}
+	client := NewClient(dockerClient)
+
+	// creating a test postgres container
+	container, err := createTestContainer(client, "hello-world", "hello-world", []string{})
+
+	// starting it up via run
+	type runContainerResult struct {
+		failed bool
+		err    error
+	}
+	runOut := make(chan runContainerResult)
+	go func() {
+		failed, err := client.RunContainer(container, []string{})
+		runOut <- runContainerResult{failed, err}
+	}()
+
+	// gathering the result
+	result := <-runOut
+	if err := result.err; err != nil {
+		t.Errorf("Could not run container %s: %s", container.Name, err.Error())
+	}
+
+	// cleaning it up
+	err = client.RemoveContainer(container)
+	if err != nil {
+		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 	}
 }
