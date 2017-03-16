@@ -20,13 +20,14 @@ func getTestContainerName(prefix string) (string, error) {
 	return fmt.Sprintf("%s-%s", prefix, u4), nil
 }
 
-func createTestContainer(client Client, namePrefix string, imageName string, links []string) (*docker.Container, error) {
+func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
 	containerName, err := getTestContainerName(namePrefix)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	return client.CreateContainer(containerName, imageName, links)
+	container, err := client.CreateContainer(containerName, imageName, links)
+	return containerName, container, err
 }
 
 func TestNewDockerClient(t *testing.T) {
@@ -56,9 +57,9 @@ func TestCreateContaienr(t *testing.T) {
 
 	client := NewClient(dockerClient)
 
-	container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
 	if err != nil {
-		t.Errorf("Could not create %s container: %s", container.Name, err.Error())
+		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 	}
 
 	err = client.RemoveContainer(container)
@@ -75,9 +76,9 @@ func TestStartContainer(t *testing.T) {
 
 	client := NewClient(dockerClient)
 
-	container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
 	if err != nil {
-		t.Errorf("Could not create %s container: %s", container.Name, err.Error())
+		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 	}
 
 	err = client.StartContainer(container, []string{})
@@ -103,8 +104,10 @@ func TestRunContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	// creating a test postgres container
-	container, err := createTestContainer(client, "hello-world", "hello-world", []string{})
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	if err != nil {
+		t.Errorf("Could not create %s container: %s", containerName, err.Error())
+	}
 
 	// starting it up via run
 	type runContainerResult struct {
