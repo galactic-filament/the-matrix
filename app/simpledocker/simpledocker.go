@@ -3,7 +3,6 @@ package simpledocker
 import (
 	"bytes"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
 )
 
@@ -50,11 +49,6 @@ func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 
 // StartContainer - starts a container up
 func (c Client) StartContainer(container *docker.Container, links []string) error {
-	log.WithFields(log.Fields{
-		"container": container.Name,
-		"links":     links,
-	}).Info("Starting container with links")
-
 	err := c.dockerClient.StartContainer(container.ID, &docker.HostConfig{Links: links})
 	if err != nil {
 		return err
