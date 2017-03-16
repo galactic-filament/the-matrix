@@ -1,14 +1,15 @@
 sudo: required
 language: go
 go:
-  - 1.5
+  - 1.8
 services:
   - docker
 
 env:
-  - ENV=travis
-before_script:
-  - go vet github.com/ihsw/the-matrix/app/...
-  - docker build -t ihsw/the-matrix-db ./db
+  global:
+  - APP_PATH=github.com/ihsw/the-matrix/app
+install:
+- go get -t $APP_PATH/...
 script:
-  - go test -v github.com/ihsw/the-matrix/app/...
+- go vet $APP_PATH/...
+- go test -v $APP_PATH/...
