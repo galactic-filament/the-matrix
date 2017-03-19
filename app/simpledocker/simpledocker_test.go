@@ -11,7 +11,7 @@ import (
 const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
 
-func getTestContainerName(prefix string) (string, error) {
+func getPrefixedUuid(prefix string) (string, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
 		return "", err
@@ -21,7 +21,7 @@ func getTestContainerName(prefix string) (string, error) {
 }
 
 func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
-	containerName, err := getTestContainerName(namePrefix)
+	containerName, err := getPrefixedUuid(namePrefix)
 	if err != nil {
 		return "", nil, err
 	}
@@ -141,6 +141,32 @@ func TestRunContainer(t *testing.T) {
 	err = client.RemoveContainer(container)
 	if err != nil {
 		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
+		return
+	}
+}
+
+func TestHasImage(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	nonexistentImageName, err := getPrefixedUuid("fdsfgs")
+	if err != nil {
+		t.Errorf("Could not create non-existent image name fdsfgs: %s", err.Error())
+		return
+	}
+
+	hasImage, err := client.HasImage(nonexistentImageName)
+	if err != nil {
+		t.Errorf("Could not check for image %s: %s", nonexistentImageName, err.Error())
+		return
+	}
+
+	if hasImage {
+		t.Errorf("Image %s was found when it should not have been", nonexistentImageName)
 		return
 	}
 }

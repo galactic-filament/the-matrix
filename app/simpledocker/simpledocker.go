@@ -102,3 +102,25 @@ func (c Client) GetContainer(id string) (*docker.Container, error) {
 func (c Client) GetImage(id string) (*docker.Image, error) {
 	return c.dockerClient.InspectImage(id)
 }
+
+// HasImage - validates whether an image exists
+func (c Client) HasImage(id string) (bool, error) {
+	_, err := c.GetImage(id)
+	if err != nil {
+		if err != docker.ErrNoSuchImage {
+			return false, err
+		}
+
+		return false, nil
+	}
+
+	return true, nil
+}
+
+// PullImage - pulls an image by tag
+func (c Client) PullImage(repository string) error {
+	return c.dockerClient.PullImage(
+		docker.PullImageOptions{Repository: repository},
+		docker.AuthConfiguration{},
+	)
+}
