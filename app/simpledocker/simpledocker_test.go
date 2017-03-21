@@ -195,3 +195,31 @@ func TestPullImage(t *testing.T) {
 		t.Errorf("Could not pull test image %s: %s", defaultTestImage, err.Error())
 	}
 }
+
+func TestRemoveImage(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	hasImage, err := client.HasImage(defaultTestImage)
+	if err != nil {
+		t.Errorf("Could not check if image exists %s: %s", defaultTestImage, err.Error())
+		return
+	}
+
+	if !hasImage {
+		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
+			t.Errorf("Could not pull default test image %s with tag %s: %s", defaultTestImage, defaultTestImageTag, err.Error())
+			return
+		}
+	}
+
+	imageID := fmt.Sprintf("%s:%s", defaultTestImage, defaultTestImageTag)
+	if err := client.RemoveImage(imageID); err != nil {
+		t.Errorf("Could not remove image %s: %s", imageID, err.Error())
+		return
+	}
+}

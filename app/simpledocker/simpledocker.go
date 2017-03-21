@@ -117,10 +117,13 @@ func (c Client) HasImage(id string) (bool, error) {
 	return true, nil
 }
 
-// PullImage - pulls an image by tag
+// PullImage - pulls an image by repository and tag
 func (c Client) PullImage(repository string, tag string) error {
 	return c.dockerClient.PullImage(
 		docker.PullImageOptions{Repository: repository, Tag: tag},
 		docker.AuthConfiguration{},
 	)
 }
+
+// RemoveImage - removes an image by id
+func (c Client) RemoveImage(imageID string) error { return c.dockerClient.RemoveImage(imageID) }
