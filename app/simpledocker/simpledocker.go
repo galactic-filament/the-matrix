@@ -118,9 +118,9 @@ func (c Client) HasImage(id string) (bool, error) {
 }
 
 // PullImage - pulls an image by tag
-func (c Client) PullImage(repository string) error {
+func (c Client) PullImage(repository string, tag string) error {
 	return c.dockerClient.PullImage(
-		docker.PullImageOptions{Repository: repository},
+		docker.PullImageOptions{Repository: repository, Tag: tag},
 		docker.AuthConfiguration{},
 	)
 }

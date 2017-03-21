@@ -11,7 +11,7 @@ import (
 const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
 
-func getPrefixedUuid(prefix string) (string, error) {
+func getPrefixedUUID(prefix string) (string, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
 		return "", err
@@ -21,7 +21,7 @@ func getPrefixedUuid(prefix string) (string, error) {
 }
 
 func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
-	containerName, err := getPrefixedUuid(namePrefix)
+	containerName, err := getPrefixedUUID(namePrefix)
 	if err != nil {
 		return "", nil, err
 	}
@@ -153,7 +153,7 @@ func TestHasImage(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	nonexistentImageName, err := getPrefixedUuid("fdsfgs")
+	nonexistentImageName, err := getPrefixedUUID("fdsfgs")
 	if err != nil {
 		t.Errorf("Could not create non-existent image name fdsfgs: %s", err.Error())
 		return
@@ -168,5 +168,18 @@ func TestHasImage(t *testing.T) {
 	if hasImage {
 		t.Errorf("Image %s was found when it should not have been", nonexistentImageName)
 		return
+	}
+}
+
+func TestPullImage(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	if err := client.PullImage(defaultTestImage, "latest"); err != nil {
+		t.Errorf("Could not pull test image %s: %s", defaultTestImage, err.Error())
 	}
 }
