@@ -10,6 +10,7 @@ import (
 
 const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
+const defaultTestImageTag = "latest"
 
 func getPrefixedUUID(prefix string) (string, error) {
 	u4, err := uuid.NewV4()
@@ -24,6 +25,17 @@ func createTestContainer(client Client, namePrefix string, imageName string, lin
 	containerName, err := getPrefixedUUID(namePrefix)
 	if err != nil {
 		return "", nil, err
+	}
+
+	hasImage, err := client.HasImage(defaultTestImage)
+	if err != nil {
+		return "", nil, err
+	}
+
+	if !hasImage {
+		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
+			return "", nil, err
+		}
 	}
 
 	container, err := client.CreateContainer(containerName, imageName, links)
@@ -179,7 +191,7 @@ func TestPullImage(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	if err := client.PullImage(defaultTestImage, "latest"); err != nil {
+	if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 		t.Errorf("Could not pull test image %s: %s", defaultTestImage, err.Error())
 	}
 }
