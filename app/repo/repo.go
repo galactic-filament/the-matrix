@@ -2,12 +2,31 @@ package repo
 
 import (
 	"fmt"
-	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/ihsw/the-matrix/app/simpledocker"
-	"github.com/ihsw/the-matrix/app/util"
 )
+
+const defaultRepoImageTag = "latest"
+
+func newRepo(name string, client simpledocker.Client) (Repo, error) {
+	r := Repo{name, client}
+
+	hasImage, err := client.HasImage(r.getImageID())
+	if err != nil {
+		return Repo{}, err
+	}
+
+	if hasImage {
+		return r, nil
+	}
+
+	err = client.PullImage(r.getImageID(), defaultRepoImageTag)
+	if err != nil {
+		return Repo{}, err
+	}
+
+	return r, nil
+}
 
 // Repo - container to run tests with
 type Repo struct {
@@ -15,43 +34,4 @@ type Repo struct {
 	Client simpledocker.Client
 }
 
-func newRepo(name string, simpleDocker simpledocker.Client) (Repo, error) {
-	imageID := fmt.Sprintf("ihsw/%s", name)
-	r := Repo{
-		Name:   name,
-		Client: simpleDocker,
-	}
-	if _, err := simpleDocker.GetImage(imageID); err == nil {
-		return r, nil
-	}
-
-	log.WithFields(log.Fields{
-		"name": name,
-	}).Info("Creating new repo")
-	startTime := time.Now()
-	if err := r.pullImage(imageID); err != nil {
-		log.WithFields(log.Fields{
-			"name":     name,
-			"err":      err.Error(),
-			"repoName": imageID,
-		}).Warn("Could not pull image")
-
-		return Repo{}, err
-	}
-
-	log.WithFields(log.Fields{
-		"name":     name,
-		"duration": fmt.Sprintf("%v", time.Now().Sub(startTime)),
-	}).Info("Repo create success")
-
-	return r, nil
-}
-
-func (r Repo) pullImage(repoName string) error {
-	cmd := fmt.Sprintf("docker pull %s", repoName)
-	if _, err := util.RunCommand(cmd); err != nil {
-		return err
-	}
-
-	return nil
-}
+func (r Repo) getImageID() string { return fmt.Sprintf("ihsw/%s", r.Name) }
