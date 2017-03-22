@@ -1,87 +1,59 @@
 package resource
 
 import (
+	"errors"
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
-// NewResources - generates a new list of resources
-func NewResources(simpleDocker simpledocker.Client, names map[string]string) ([]Resource, error) {
-	resources := []Resource{}
-	for name, endpointTarget := range names {
-		resource, err := newResource(name, endpointTarget, simpleDocker)
-		if err != nil {
-			return []Resource{}, err
-		}
+func getContainerID(name string) string      { return fmt.Sprintf("%s-resource", name) }
+func getContainerImageID(name string) string { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
 
-		resources = append(resources, resource)
-	}
+func newResource(name string, client simpledocker.Client) (Resource, error) {
+	r := Resource{client, name, nil}
 
-	return resources, nil
-}
-
-func newResource(name string, endpointTarget string, simpleDocker simpledocker.Client) (Resource, error) {
-	resource := Resource{
-		Name:           name,
-		EndpointTarget: endpointTarget,
-		simpleDocker:   simpleDocker,
-	}
-
-	var err error
-	resource.Container, err = getContainer(resource)
-	if err != nil {
-		return Resource{}, err
-	}
-
-	return resource, nil
-}
-
-func getContainer(r Resource) (*docker.Container, error) {
-	containerID := fmt.Sprintf("%s-resource", r.Name)
-	container, err := r.simpleDocker.GetContainer(containerID)
-	if err == nil {
-		return container, nil
-	}
-
-	log.WithFields(log.Fields{
-		"name": r.Name,
-	}).Info("Creating resource container")
-	container, err = r.simpleDocker.CreateContainer(
-		containerID,
-		fmt.Sprintf("ihsw/the-matrix-%s", r.Name),
+	container, err := client.CreateContainer(
+		getContainerID(name),
+		getContainerImageID(name),
 		[]string{},
 	)
 	if err != nil {
-		return nil, err
+		return Resource{}, err
+	}
+	r.container = container
+
+	if err := r.client.StartContainer(container, []string{}); err != nil {
+		return Resource{}, err
 	}
 
-	if err := r.simpleDocker.StartContainer(container, []string{}); err != nil {
-		return nil, err
-	}
-
-	return container, nil
+	return r, nil
 }
 
 // Resource - a container for each Endpoint to use (database, etc)
 type Resource struct {
-	Name           string
-	EndpointTarget string
-	simpleDocker   simpledocker.Client
-	Container      *docker.Container
+	client    simpledocker.Client
+	name      string
+	container *docker.Container
 }
 
 // Clean - stops and removes the Resource's container
 func (r Resource) Clean() error {
-	if err := r.simpleDocker.StopContainer(r.Container); err != nil {
+	if r.container == nil {
+		return errors.New("Resource container was nil")
+	}
+
+	if err := r.client.StopContainer(r.container); err != nil {
 		return err
 	}
 
-	if err := r.simpleDocker.RemoveContainer(r.Container); err != nil {
+	if err := r.client.RemoveContainer(r.container); err != nil {
 		return err
 	}
 
 	return nil
 }
+
+// GetLinkLine - returns the expected docker link line
+func (r Resource) GetLinkLine() string { return fmt.Sprintf("%s:%s", r.name, r.name) }

@@ -47,7 +47,7 @@ func getContainer(e Endpoint, resources []resource.Resource) (*docker.Container,
 	for _, resource := range resources {
 		containerLinks = append(
 			containerLinks,
-			fmt.Sprintf("%s:%s", resource.Container.ID, resource.EndpointTarget),
+			resource.GetLinkLine(),
 		)
 	}
 
