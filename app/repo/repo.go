@@ -13,8 +13,9 @@ func GetImageID(name string) string { return fmt.Sprintf("ihsw/%s", name) }
 
 func newRepo(name string, client simpledocker.Client) (Repo, error) {
 	r := Repo{name, client}
+	imageID := GetImageID(r.Name)
 
-	hasImage, err := client.HasImage(GetImageID(r.Name))
+	hasImage, err := client.HasImage(imageID)
 	if err != nil {
 		return Repo{}, err
 	}
@@ -23,7 +24,7 @@ func newRepo(name string, client simpledocker.Client) (Repo, error) {
 		return r, nil
 	}
 
-	err = client.PullImage(GetImageID(r.Name), defaultRepoImageTag)
+	err = client.PullImage(imageID, defaultRepoImageTag)
 	if err != nil {
 		return Repo{}, err
 	}
