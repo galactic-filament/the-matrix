@@ -17,7 +17,7 @@ func TestNewResource(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	resource, err := newResource(defaultResourceName, client)
+	resource, err := newResource(client, defaultResourceName)
 	if err != nil {
 		t.Errorf("Could not create repo %s: %s", defaultResourceName, err.Error())
 		return

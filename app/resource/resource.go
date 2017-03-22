@@ -11,7 +11,7 @@ import (
 func getContainerID(name string) string      { return fmt.Sprintf("%s-resource", name) }
 func getContainerImageID(name string) string { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
 
-func newResource(name string, client simpledocker.Client) (Resource, error) {
+func newResource(client simpledocker.Client, name string) (Resource, error) {
 	r := Resource{client, name, nil}
 
 	container, err := client.CreateContainer(

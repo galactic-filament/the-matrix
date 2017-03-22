@@ -6,7 +6,7 @@ import "github.com/ihsw/the-matrix/app/simpledocker"
 func NewResources(client simpledocker.Client, names []string) ([]Resource, error) {
 	resources := []Resource{}
 	for _, name := range names {
-		resource, err := newResource(name, client)
+		resource, err := newResource(client, name)
 		if err != nil {
 			return []Resource{}, err
 		}
