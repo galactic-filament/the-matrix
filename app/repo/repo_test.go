@@ -45,6 +45,7 @@ func TestNonexistentNewRepo(t *testing.T) {
 		}
 	}
 
+	t.Logf("Creating new repo %s", defaultRepoName)
 	if _, err := newRepo(defaultRepoName, client); err != nil {
 		t.Errorf("Could not create new repo %s :%s", defaultRepoName, err.Error())
 		return
