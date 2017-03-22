@@ -8,15 +8,15 @@ import (
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
-func getContainerID(name string) string      { return fmt.Sprintf("%s-resource", name) }
-func getContainerImageID(name string) string { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
+func getContainerID(name string) string { return fmt.Sprintf("%s-resource", name) }
+func getImageID(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
 
 func newResource(client simpledocker.Client, name string) (Resource, error) {
 	r := Resource{client, name, nil}
 
 	container, err := client.CreateContainer(
 		getContainerID(name),
-		getContainerImageID(name),
+		getImageID(name),
 		[]string{},
 	)
 	if err != nil {
