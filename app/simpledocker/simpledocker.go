@@ -127,3 +127,13 @@ func (c Client) PullImage(repository string, tag string) error {
 
 // RemoveImage - removes an image by id
 func (c Client) RemoveImage(imageID string) error { return c.dockerClient.RemoveImage(imageID) }
+
+// BuildImage - builds an image by name and dockerfile path
+func (c Client) BuildImage(name string, contextDir string) error {
+	outputBuffer := bytes.NewBuffer(nil)
+	return c.dockerClient.BuildImage(docker.BuildImageOptions{
+		Name:         name,
+		ContextDir:   contextDir,
+		OutputStream: outputBuffer,
+	})
+}

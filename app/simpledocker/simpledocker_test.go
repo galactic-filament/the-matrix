@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"os"
+
 	docker "github.com/fsouza/go-dockerclient"
 	uuid "github.com/nu7hatch/gouuid"
 )
@@ -220,6 +222,38 @@ func TestRemoveImage(t *testing.T) {
 	imageID := fmt.Sprintf("%s:%s", defaultTestImage, defaultTestImageTag)
 	if err := client.RemoveImage(imageID); err != nil {
 		t.Errorf("Could not remove image %s: %s", imageID, err.Error())
+		return
+	}
+}
+
+func TestBuildImage(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Errorf("Could not get working dir: %s", err.Error())
+		return
+	}
+	contextDir := fmt.Sprintf("%s/../../test-fixtures", cwd)
+
+	exampleImageName, err := getPrefixedUUID("hello-world")
+	if err != nil {
+		t.Errorf("Could not generate example image name: %s", err.Error())
+		return
+	}
+
+	if err := client.BuildImage(exampleImageName, contextDir); err != nil {
+		t.Errorf("Could not build example image: %s", err.Error())
+		return
+	}
+
+	if err := client.RemoveImage(exampleImageName); err != nil {
+		t.Errorf("Could not remove example image: %s", err.Error())
 		return
 	}
 }
