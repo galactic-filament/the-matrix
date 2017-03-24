@@ -3,10 +3,10 @@ package resource
 import "github.com/ihsw/the-matrix/app/simpledocker"
 
 // NewResources - generates a new list of resources
-func NewResources(client simpledocker.Client, names []string) ([]Resource, error) {
+func NewResources(client simpledocker.Client, optList []Opts) ([]Resource, error) {
 	resources := []Resource{}
-	for _, name := range names {
-		resource, err := newResource(client, name)
+	for _, opts := range optList {
+		resource, err := newResource(client, opts)
 		if err != nil {
 			return []Resource{}, err
 		}

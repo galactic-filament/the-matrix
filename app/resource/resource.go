@@ -11,12 +11,23 @@ import (
 func getContainerID(name string) string { return fmt.Sprintf("%s-resource", name) }
 func getImageID(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
 
-func newResource(client simpledocker.Client, name string) (Resource, error) {
-	r := Resource{client, name, nil}
+func newResource(client simpledocker.Client, opts Opts) (Resource, error) {
+	r := Resource{client, opts.Name, nil}
+	imageID := getImageID(r.name)
+
+	hasImage, err := client.HasImage(imageID)
+	if err != nil {
+		return Resource{}, err
+	}
+	if !hasImage {
+		if err := client.BuildImage(imageID, opts.DockerfileContextDir); err != nil {
+			return Resource{}, err
+		}
+	}
 
 	container, err := client.CreateContainer(
-		getContainerID(name),
-		getImageID(name),
+		getContainerID(r.name),
+		imageID,
 		[]string{},
 	)
 	if err != nil {
@@ -29,6 +40,12 @@ func newResource(client simpledocker.Client, name string) (Resource, error) {
 	}
 
 	return r, nil
+}
+
+// Opts - expect values when calling new-resource
+type Opts struct {
+	Name                 string
+	DockerfileContextDir string
 }
 
 // Resource - a container for each Endpoint to use (database, etc)

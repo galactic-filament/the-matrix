@@ -1,6 +1,8 @@
 package resource
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
@@ -15,7 +17,16 @@ func TestNewResources(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	resources, err := NewResources(client, []string{defaultResourceName})
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Errorf("Could not get working dir: %s", err.Error())
+		return
+	}
+	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
+
+	resources, err := NewResources(client, []Opts{
+		Opts{defaultResourceName, resourceDir},
+	})
 	if err != nil {
 		t.Errorf("Could not create new resources with default resource %s: %s", defaultResourceName, err.Error())
 		return
