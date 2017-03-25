@@ -24,8 +24,10 @@ func TestNewResources(t *testing.T) {
 	}
 	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
 
-	resources, err := NewResources(client, []Opts{
-		Opts{defaultResourceName, resourceDir},
+	resources, err := NewResources(client, []Opts{Opts{
+		Name:                 defaultResourceName,
+		DockerfileContextDir: resourceDir,
+		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"}},
 	})
 	if err != nil {
 		t.Errorf("Could not create new resources with default resource %s: %s", defaultResourceName, err.Error())

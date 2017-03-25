@@ -27,7 +27,11 @@ func TestNewResource(t *testing.T) {
 	}
 	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
 
-	resource, err := newResource(client, Opts{defaultResourceName, resourceDir})
+	resource, err := newResource(client, Opts{
+		Name:                 defaultResourceName,
+		DockerfileContextDir: resourceDir,
+		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"},
+	})
 	if err != nil {
 		t.Errorf("Could not create repo %s: %s", defaultResourceName, err.Error())
 		return

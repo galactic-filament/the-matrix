@@ -12,7 +12,7 @@ type endpointTask struct {
 }
 
 // NewEndpoints - creates a new list of endpoints
-func NewEndpoints(repos []repo.Repo, resources []resource.Resource) ([]Endpoint, error) {
+func NewEndpoints(repos []repo.Repo, resources resource.Resources) ([]Endpoint, error) {
 	// setting up the workers
 	in := make(chan repo.Repo)
 	out := make(chan endpointTask)

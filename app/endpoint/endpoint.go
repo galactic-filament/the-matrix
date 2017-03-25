@@ -4,66 +4,34 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
 )
 
-func newEndpoint(repo repo.Repo, resources []resource.Resource) (Endpoint, error) {
-	endpoint := Endpoint{
-		Repo: repo,
-	}
+func newEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error) {
+	endpoint := Endpoint{repo, nil}
 
-	var err error
-	endpoint.Container, err = getContainer(endpoint, resources)
+	// creating an endpoint container
+	container, err := repo.Client.CreateContainer(
+		fmt.Sprintf("%s-endpoint", endpoint.Name),
+		fmt.Sprintf("ihsw/%s", endpoint.Name),
+		resources.GetEnvVarsList(),
+	)
 	if err != nil {
 		return Endpoint{}, err
 	}
 
-	return endpoint, nil
-}
-
-func getContainer(e Endpoint, resources []resource.Resource) (*docker.Container, error) {
-	log.WithFields(log.Fields{
-		"endpoint": e.Name,
-	}).Info("Creating endpoint container")
-
-	container, err := e.Client.CreateContainer(
-		fmt.Sprintf("%s-endpoint", e.Name),
-		fmt.Sprintf("ihsw/%s", e.Name),
-		[]string{"DATABASE_HOST=Db"},
-	)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"endpoint": e.Name,
-			"err":      err.Error(),
-		}).Warn("Could not create container")
-
-		return nil, err
+	// starting it up with links to the provided resources
+	if err := endpoint.Client.StartContainer(container, resources.GetLinkLineList()); err != nil {
+		return Endpoint{}, err
 	}
+	endpoint.Container = container
 
-	containerLinks := []string{}
-	for _, resource := range resources {
-		containerLinks = append(
-			containerLinks,
-			resource.GetLinkLine(),
-		)
-	}
-
-	if err := e.Client.StartContainer(container, containerLinks); err != nil {
-		log.WithFields(log.Fields{
-			"endpoint": e.Name,
-			"err":      err.Error(),
-		}).Warn("Could not start container")
-
-		return nil, err
-	}
-
-	// waiting for the container to boot up
+	// waiting for the endpoint to start up
 	time.Sleep(10 * time.Second)
 
-	return container, nil
+	return endpoint, nil
 }
 
 // Endpoint - a container ran against an Endpoint
