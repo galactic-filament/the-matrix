@@ -17,7 +17,7 @@ func NewRepos(names []string, simpleDocker simpledocker.Client) ([]Repo, error) 
 	out := make(chan repoTask)
 	worker := func() {
 		for name := range in {
-			repo, err := newRepo(name, simpleDocker)
+			repo, err := NewRepo(name, simpleDocker)
 			out <- repoTask{repo, err}
 		}
 	}

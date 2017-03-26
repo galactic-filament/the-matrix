@@ -11,7 +11,8 @@ const defaultRepoImageTag = "latest"
 // GetImageID - returns formatted image ID of a repo
 func GetImageID(name string) string { return fmt.Sprintf("ihsw/%s", name) }
 
-func newRepo(name string, client simpledocker.Client) (Repo, error) {
+// NewRepo - creates a new repo based on a local or remote docker image
+func NewRepo(name string, client simpledocker.Client) (Repo, error) {
 	r := Repo{name, client}
 	imageID := GetImageID(r.Name)
 

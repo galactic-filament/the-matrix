@@ -17,7 +17,7 @@ func TestNewRepo(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	if _, err := newRepo(defaultRepoName, client); err != nil {
+	if _, err := NewRepo(defaultRepoName, client); err != nil {
 		t.Errorf("Could not create new repo %s: %s", defaultRepoName, err.Error())
 	}
 }
@@ -46,7 +46,7 @@ func TestNonexistentNewRepo(t *testing.T) {
 	}
 
 	t.Logf("Creating new repo %s", defaultRepoName)
-	if _, err := newRepo(defaultRepoName, client); err != nil {
+	if _, err := NewRepo(defaultRepoName, client); err != nil {
 		t.Errorf("Could not create new repo %s :%s", defaultRepoName, err.Error())
 		return
 	}
@@ -76,7 +76,7 @@ func TestExistentNewRepo(t *testing.T) {
 		}
 	}
 
-	if _, err := newRepo(defaultRepoName, client); err != nil {
+	if _, err := NewRepo(defaultRepoName, client); err != nil {
 		t.Errorf("Could not create new repo %s :%s", defaultRepoName, err.Error())
 		return
 	}
