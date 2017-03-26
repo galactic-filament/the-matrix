@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"time"
 
+	"errors"
+
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
 )
 
-func newEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error) {
+// NewEndpoint - creates a new endpoint for a client to consume
+func NewEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error) {
 	endpoint := Endpoint{repo, nil}
 
 	// creating an endpoint container
@@ -21,12 +24,12 @@ func newEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error)
 	if err != nil {
 		return Endpoint{}, err
 	}
+	endpoint.Container = container
 
 	// starting it up with links to the provided resources
 	if err := endpoint.Client.StartContainer(container, resources.GetLinkLineList()); err != nil {
 		return Endpoint{}, err
 	}
-	endpoint.Container = container
 
 	// waiting for the endpoint to start up
 	time.Sleep(10 * time.Second)
@@ -41,7 +44,11 @@ type Endpoint struct {
 }
 
 // Clean - stops and removes an Endpoint's container
-func (e Endpoint) Clean(prevErr error) error {
+func (e Endpoint) Clean() error {
+	if e.Container == nil {
+		return errors.New("Endpoint container was nil")
+	}
+
 	if err := e.Client.StopContainer(e.Container); err != nil {
 		return err
 	}
@@ -50,5 +57,5 @@ func (e Endpoint) Clean(prevErr error) error {
 		return err
 	}
 
-	return prevErr
+	return nil
 }

@@ -18,7 +18,7 @@ func NewEndpoints(repos []repo.Repo, resources resource.Resources) ([]Endpoint, 
 	out := make(chan endpointTask)
 	worker := func() {
 		for repo := range in {
-			endpoint, err := newEndpoint(repo, resources)
+			endpoint, err := NewEndpoint(repo, resources)
 			out <- endpointTask{endpoint, err}
 		}
 	}
