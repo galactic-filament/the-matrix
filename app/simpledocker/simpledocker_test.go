@@ -6,6 +6,8 @@ import (
 
 	"os"
 
+	"time"
+
 	docker "github.com/fsouza/go-dockerclient"
 	uuid "github.com/nu7hatch/gouuid"
 )
@@ -13,6 +15,7 @@ import (
 const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
+const defaultDbImage = "postgres"
 
 func getPrefixedUUID(prefix string) (string, error) {
 	u4, err := uuid.NewV4()
@@ -254,6 +257,126 @@ func TestBuildImage(t *testing.T) {
 
 	if err := client.RemoveImage(exampleImageName); err != nil {
 		t.Errorf("Could not remove example image: %s", err.Error())
+		return
+	}
+}
+
+func TestIsRunning(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	// pulling the default test image where appropriate
+	hasImage, err := client.HasImage(defaultTestImage)
+	if err != nil {
+		t.Errorf("Could not check if has image: %s", err.Error())
+		return
+	}
+	if !hasImage {
+		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
+			t.Errorf("Could not pull image %s: %s", defaultTestImage, err.Error())
+			return
+		}
+	}
+
+	// creating one and starting it up
+	name, err := getPrefixedUUID(defaultTestContainerName)
+	if err != nil {
+		t.Errorf("Could not create prefixed container name: %s", err.Error())
+		return
+	}
+	container, err := client.CreateContainer(name, defaultTestImage, []string{})
+	if err != nil {
+		t.Errorf("Could not create test container from image %s: %s", defaultTestImage, err.Error())
+		return
+	}
+	if err := client.StartContainer(container, []string{}); err != nil {
+		t.Errorf("Could not start container %s: %s", container.Name, err.Error())
+		return
+	}
+
+	// waiting 5s for it to exit
+	time.Sleep(5 * time.Second)
+
+	// validating that it exited
+	isRunning, err := client.IsRunning(container)
+	if err != nil {
+		t.Errorf("Could not check if container %s is running: %s", container.Name, err.Error())
+		return
+	}
+	if isRunning {
+		t.Errorf("Container %s was found to be running when it should not have been", container.Name)
+		return
+	}
+
+	// cleaning it up
+	if err := client.RemoveContainer(container); err != nil {
+		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
+		return
+	}
+}
+
+func TestIsStillRunning(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	// pulling the default test image where appropriate
+	hasImage, err := client.HasImage(defaultDbImage)
+	if err != nil {
+		t.Errorf("Could not check if has image: %s", err.Error())
+		return
+	}
+	if !hasImage {
+		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
+			t.Errorf("Could not pull image %s: %s", defaultDbImage, err.Error())
+			return
+		}
+	}
+
+	// creating one and starting it up
+	name, err := getPrefixedUUID(defaultTestContainerName)
+	if err != nil {
+		t.Errorf("Could not create prefixed container name: %s", err.Error())
+		return
+	}
+	container, err := client.CreateContainer(name, defaultDbImage, []string{})
+	if err != nil {
+		t.Errorf("Could not create test container from image %s: %s", defaultDbImage, err.Error())
+		return
+	}
+	if err := client.StartContainer(container, []string{}); err != nil {
+		t.Errorf("Could not start container %s: %s", container.Name, err.Error())
+		return
+	}
+
+	// waiting 5s to see if it is still up
+	time.Sleep(5 * time.Second)
+
+	// validating that it is still up
+	isRunning, err := client.IsRunning(container)
+	if err != nil {
+		t.Errorf("Could not check if container %s is running: %s", container.Name, err.Error())
+		return
+	}
+	if !isRunning {
+		t.Errorf("Container %s was found to be not running when it should have been", container.Name)
+		return
+	}
+
+	// cleaning it up
+	if err := client.StopContainer(container); err != nil {
+		t.Errorf("Could not stop container %s: %s", container.Name, err.Error())
+		return
+	}
+	if err := client.RemoveContainer(container); err != nil {
+		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 		return
 	}
 }

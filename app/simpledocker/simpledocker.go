@@ -137,3 +137,13 @@ func (c Client) BuildImage(name string, contextDir string) error {
 		OutputStream: outputBuffer,
 	})
 }
+
+// IsRunning - checks whether a container is running
+func (c Client) IsRunning(container *docker.Container) (bool, error) {
+	container, err := c.dockerClient.InspectContainer(container.ID)
+	if err != nil {
+		return false, err
+	}
+
+	return container.State.Running, nil
+}
