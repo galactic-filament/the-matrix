@@ -27,7 +27,7 @@ func TestNewResource(t *testing.T) {
 	}
 	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
 
-	resource, err := newResource(client, Opts{
+	resource, err := NewResource(client, Opts{
 		Name:                 defaultResourceName,
 		DockerfileContextDir: resourceDir,
 		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"},

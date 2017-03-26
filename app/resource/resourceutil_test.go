@@ -27,8 +27,8 @@ func TestNewResources(t *testing.T) {
 	resources, err := NewResources(client, []Opts{Opts{
 		Name:                 defaultResourceName,
 		DockerfileContextDir: resourceDir,
-		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"}},
-	})
+		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"},
+	}})
 	if err != nil {
 		t.Errorf("Could not create new resources with default resource %s: %s", defaultResourceName, err.Error())
 		return
