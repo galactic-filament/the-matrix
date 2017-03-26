@@ -34,10 +34,8 @@ func TestNewResources(t *testing.T) {
 		return
 	}
 
-	for _, resource := range resources {
-		if err := resource.Clean(); err != nil {
-			t.Errorf("Could not clean resource %s: %s", resource.name, err.Error())
-			return
-		}
+	if err := resources.Clean(); err != nil {
+		t.Errorf("Could not clean resources: %s", err.Error())
+		return
 	}
 }

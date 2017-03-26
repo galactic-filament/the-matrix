@@ -87,30 +87,3 @@ func (r Resource) GetEnvVars() []string {
 
 	return envVars
 }
-
-// Resources - a list of resources
-type Resources struct {
-	Values []Resource
-}
-
-// GetLinkLineList - returns a list of docker link lines
-func (r Resources) GetLinkLineList() []string {
-	linkLineList := []string{}
-	for _, resource := range r.Values {
-		linkLineList = append(linkLineList, resource.GetLinkLine())
-	}
-
-	return linkLineList
-}
-
-// GetEnvVarsList - returns a list of env vars for a group of resources
-func (r Resources) GetEnvVarsList() []string {
-	envVarsList := []string{}
-	for _, resource := range r.Values {
-		for _, envVars := range resource.GetEnvVars() {
-			envVarsList = append(envVarsList, envVars)
-		}
-	}
-
-	return envVarsList
-}
