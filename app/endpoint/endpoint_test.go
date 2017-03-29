@@ -1,9 +1,11 @@
 package endpoint
 
 import (
-	"fmt"
 	"os"
 	"testing"
+
+	"fmt"
+	"path/filepath"
 
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
@@ -27,7 +29,11 @@ func TestNewEndpoint(t *testing.T) {
 		t.Errorf("Could not get working dir: %s", err.Error())
 		return
 	}
-	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
+	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, defaultResourceName))
+	if err != nil {
+		t.Errorf("Could not get absolute filepath for default resource name: %s", err.Error())
+		return
+	}
 
 	endpointResources, err := resource.NewResources(client, []resource.Opts{resource.Opts{
 		Name:                 defaultResourceName,
