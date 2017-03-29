@@ -6,16 +6,26 @@ import (
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 func getContainerID(name string) string { return fmt.Sprintf("%s-resource", name) }
 func getImageID(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
+func getPrefixedUUID(prefix string) (string, error) {
+	u4, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s-%s", prefix, u4), nil
+}
 
 // NewResource - creates a new resource based on a dockerfile, optionally building it where it does not exist
 func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	r := Resource{client, opts.Name, nil, opts.EndpointEnvVars}
 	imageID := getImageID(r.name)
 
+	// validating that the resource image exists, if not then building it
 	hasImage, err := client.HasImage(imageID)
 	if err != nil {
 		return Resource{}, err
@@ -26,16 +36,18 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 		}
 	}
 
-	container, err := client.CreateContainer(
-		getContainerID(r.name),
-		imageID,
-		[]string{},
-	)
+	// creating an endpoint container
+	containerID, err := getPrefixedUUID(getContainerID(r.name))
+	if err != nil {
+		return Resource{}, err
+	}
+	container, err := client.CreateContainer(containerID, imageID, []string{})
 	if err != nil {
 		return Resource{}, err
 	}
 	r.container = container
 
+	// starting it up
 	if err := r.client.StartContainer(container, []string{}); err != nil {
 		return Resource{}, err
 	}
