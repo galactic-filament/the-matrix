@@ -2,6 +2,7 @@ package simpledocker
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"os"
@@ -242,7 +243,11 @@ func TestBuildImage(t *testing.T) {
 		t.Errorf("Could not get working dir: %s", err.Error())
 		return
 	}
-	contextDir := fmt.Sprintf("%s/../../test-fixtures", cwd)
+	contextDir, err := filepath.Abs(fmt.Sprintf("%s/../../text-fixtures", cwd))
+	if err != nil {
+		t.Errorf("Could not get absolute filepath for test fixture: %s", err.Error())
+		return
+	}
 
 	exampleImageName, err := getPrefixedUUID("hello-world")
 	if err != nil {
