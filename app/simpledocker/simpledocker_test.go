@@ -2,15 +2,13 @@ package simpledocker
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"testing"
-
-	"os"
-
 	"time"
 
 	docker "github.com/fsouza/go-dockerclient"
-	uuid "github.com/nu7hatch/gouuid"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 const defaultTestContainerName = "test-container"
@@ -18,17 +16,8 @@ const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
 const defaultDbImage = "postgres"
 
-func getPrefixedUUID(prefix string) (string, error) {
-	u4, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s-%s", prefix, u4), nil
-}
-
 func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
-	containerName, err := getPrefixedUUID(namePrefix)
+	containerName, err := util.GetPrefixedUUID(namePrefix)
 	if err != nil {
 		return "", nil, err
 	}
@@ -171,7 +160,7 @@ func TestHasImage(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	nonexistentImageName, err := getPrefixedUUID("fdsfgs")
+	nonexistentImageName, err := util.GetPrefixedUUID("fdsfgs")
 	if err != nil {
 		t.Errorf("Could not create non-existent image name fdsfgs: %s", err.Error())
 		return
@@ -252,7 +241,7 @@ func TestBuildImage(t *testing.T) {
 	}
 
 	// generating an image name
-	exampleImageName, err := getPrefixedUUID("hello-world")
+	exampleImageName, err := util.GetPrefixedUUID("hello-world")
 	if err != nil {
 		t.Errorf("Could not generate example image name: %s", err.Error())
 		return
@@ -293,7 +282,7 @@ func TestIsRunning(t *testing.T) {
 	}
 
 	// creating one and starting it up
-	name, err := getPrefixedUUID(defaultTestContainerName)
+	name, err := util.GetPrefixedUUID(defaultTestContainerName)
 	if err != nil {
 		t.Errorf("Could not create prefixed container name: %s", err.Error())
 		return
@@ -351,7 +340,7 @@ func TestIsStillRunning(t *testing.T) {
 	}
 
 	// creating one and starting it up
-	name, err := getPrefixedUUID(defaultTestContainerName)
+	name, err := util.GetPrefixedUUID(defaultTestContainerName)
 	if err != nil {
 		t.Errorf("Could not create prefixed container name: %s", err.Error())
 		return

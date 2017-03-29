@@ -1,11 +1,10 @@
 package endpoint
 
 import (
-	"os"
-	"testing"
-
 	"fmt"
+	"os"
 	"path/filepath"
+	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"

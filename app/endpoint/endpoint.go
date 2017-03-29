@@ -1,10 +1,9 @@
 package endpoint
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"errors"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"

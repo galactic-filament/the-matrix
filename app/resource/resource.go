@@ -6,19 +6,11 @@ import (
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
-	uuid "github.com/nu7hatch/gouuid"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 func getContainerID(name string) string { return fmt.Sprintf("%s-resource", name) }
 func getImageID(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
-func getPrefixedUUID(prefix string) (string, error) {
-	u4, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s-%s", prefix, u4), nil
-}
 
 // NewResource - creates a new resource based on a dockerfile, optionally building it where it does not exist
 func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
@@ -37,7 +29,7 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	}
 
 	// creating an endpoint container
-	containerID, err := getPrefixedUUID(getContainerID(r.name))
+	containerID, err := util.GetPrefixedUUID(getContainerID(r.name))
 	if err != nil {
 		return Resource{}, err
 	}

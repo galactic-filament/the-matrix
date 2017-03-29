@@ -1,11 +1,23 @@
 package util
 
 import (
+	"fmt"
 	"os/exec"
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
+	uuid "github.com/nu7hatch/gouuid"
 )
+
+// GetPrefixedUUID - returns a prefixed uuid
+func GetPrefixedUUID(prefix string) (string, error) {
+	u4, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s-%s", prefix, u4), nil
+}
 
 // RunCommand - runs a shell command
 func RunCommand(cmd string) ([]byte, error) {
