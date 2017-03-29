@@ -23,6 +23,10 @@ func TestNewEndpoint(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
+	/**
+	 * endpoint resources
+	 */
+	// creating the resource dir
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Errorf("Could not get working dir: %s", err.Error())
@@ -34,6 +38,7 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 
+	// creating the test resource
 	endpointResources, err := resource.NewResources(client, []resource.Opts{resource.Opts{
 		Name:                 defaultResourceName,
 		DockerfileContextDir: resourceDir,
@@ -44,11 +49,16 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 
+	/**
+	 * endpoint
+	 */
+	// creating the resource repo
 	repo, err := repo.NewRepo(defaultRepoName, client)
 	if err != nil {
 		t.Errorf("Could not create new repo %s: %s", defaultRepoName, err.Error())
 	}
 
+	// creating the endpoint
 	endpoint, err := NewEndpoint(repo, endpointResources)
 	if err != nil {
 		if err := endpoint.resources.Clean(); err != nil {
@@ -60,6 +70,7 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 
+	// cleaning up
 	if err := endpoint.Clean(); err != nil {
 		if err := endpoint.resources.Clean(); err != nil {
 			t.Errorf("Could not clean endpoint resources: %s", err.Error())
