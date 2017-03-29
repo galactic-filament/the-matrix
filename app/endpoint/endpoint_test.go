@@ -29,11 +29,11 @@ func TestNewEndpoint(t *testing.T) {
 	}
 	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
 
-	endpointResource, err := resource.NewResource(client, resource.Opts{
+	endpointResources, err := resource.NewResources(client, []resource.Opts{resource.Opts{
 		Name:                 defaultResourceName,
 		DockerfileContextDir: resourceDir,
 		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"},
-	})
+	}})
 	if err != nil {
 		t.Errorf("Could not create a new resource with default resource %s: %s", defaultResourceName, err.Error())
 		return
@@ -44,19 +44,29 @@ func TestNewEndpoint(t *testing.T) {
 		t.Errorf("Could not create new repo %s: %s", defaultRepoName, err.Error())
 	}
 
-	endpoint, err := NewEndpoint(
-		repo,
-		resource.Resources{
-			Values: []resource.Resource{endpointResource},
-		},
-	)
+	endpoint, err := NewEndpoint(repo, endpointResources)
 	if err != nil {
+		if err := endpoint.resources.Clean(); err != nil {
+			t.Errorf("Could not clean endpoint resources: %s", err.Error())
+			return
+		}
+
 		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
 		return
 	}
 
 	if err := endpoint.Clean(); err != nil {
+		if err := endpoint.resources.Clean(); err != nil {
+			t.Errorf("Could not clean endpoint resources: %s", err.Error())
+			return
+		}
+
 		t.Errorf("Could not clean endpoint %s: %s", endpoint.Name, err.Error())
+		return
+	}
+
+	if err := endpoint.resources.Clean(); err != nil {
+		t.Errorf("Could not clean endpoint resources: %s", err.Error())
 		return
 	}
 }

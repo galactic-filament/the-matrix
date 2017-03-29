@@ -13,13 +13,13 @@ import (
 
 // NewEndpoint - creates a new endpoint for a client to consume
 func NewEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error) {
-	endpoint := Endpoint{repo, nil}
+	endpoint := Endpoint{repo, nil, resources}
 
 	// creating an endpoint container
 	container, err := repo.Client.CreateContainer(
 		fmt.Sprintf("%s-endpoint", endpoint.Name),
 		fmt.Sprintf("ihsw/%s", endpoint.Name),
-		resources.GetEnvVarsList(),
+		endpoint.resources.GetEnvVarsList(),
 	)
 	if err != nil {
 		return Endpoint{}, err
@@ -27,7 +27,7 @@ func NewEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error)
 	endpoint.Container = container
 
 	// starting it up with links to the provided resources
-	if err := endpoint.Client.StartContainer(container, resources.GetLinkLineList()); err != nil {
+	if err := endpoint.Client.StartContainer(container, endpoint.resources.GetLinkLineList()); err != nil {
 		return Endpoint{}, err
 	}
 
@@ -41,6 +41,7 @@ func NewEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error)
 type Endpoint struct {
 	repo.Repo
 	Container *docker.Container
+	resources resource.Resources
 }
 
 // Clean - stops and removes an Endpoint's container
@@ -49,8 +50,14 @@ func (e Endpoint) Clean() error {
 		return errors.New("Endpoint container was nil")
 	}
 
-	if err := e.Client.StopContainer(e.Container); err != nil {
+	isRunning, err := e.Client.IsRunning(e.Container)
+	if err != nil {
 		return err
+	}
+	if isRunning {
+		if err := e.Client.StopContainer(e.Container); err != nil {
+			return err
+		}
 	}
 
 	if err := e.Client.RemoveContainer(e.Container); err != nil {
