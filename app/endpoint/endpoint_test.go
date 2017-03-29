@@ -15,6 +15,18 @@ import (
 const defaultResourceName = "db"
 const defaultRepoName = "es-bueno"
 
+func cleanEndpoint(e Endpoint) error {
+	if err := e.Clean(); err != nil {
+		return err
+	}
+
+	if err := e.resources.Clean(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func TestNewEndpoint(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -70,19 +82,25 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 
-	// cleaning up
-	if err := endpoint.Clean(); err != nil {
-		if err := endpoint.resources.Clean(); err != nil {
-			t.Errorf("Could not clean endpoint resources: %s", err.Error())
+	// verifying that it is running
+	isRunning, err := client.IsRunning(endpoint.Container)
+	if err != nil {
+		t.Errorf("Could not check if endpoint container is running: %s", err.Error())
+		return
+	}
+	if !isRunning {
+		t.Errorf("Endpoint container %s was not up", endpoint.Name)
+		if err := cleanEndpoint(endpoint); err != nil {
+			t.Errorf("Could not clean endpoint: %s", err.Error())
 			return
 		}
 
-		t.Errorf("Could not clean endpoint %s: %s", endpoint.Name, err.Error())
 		return
 	}
 
-	if err := endpoint.resources.Clean(); err != nil {
-		t.Errorf("Could not clean endpoint resources: %s", err.Error())
+	// cleaning up
+	if err := cleanEndpoint(endpoint); err != nil {
+		t.Errorf("Could not clean endpoint: %s", err.Error())
 		return
 	}
 }
