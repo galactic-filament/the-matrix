@@ -33,7 +33,7 @@ func TestNewResource(t *testing.T) {
 		EndpointEnvVars:      map[string]string{"DATABASE_HOST": "Db"},
 	})
 	if err != nil {
-		t.Errorf("Could not create repo %s: %s", defaultResourceName, err.Error())
+		t.Errorf("Could not create resource %s: %s", defaultResourceName, err.Error())
 		return
 	}
 
