@@ -231,6 +231,7 @@ func TestRemoveImage(t *testing.T) {
 }
 
 func TestBuildImage(t *testing.T) {
+	// creating a new simpledocker client
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Errorf("Could not create a new docker client: %s", err.Error())
@@ -238,28 +239,32 @@ func TestBuildImage(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
+	// gathering context dir for the dockerfile
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Errorf("Could not get working dir: %s", err.Error())
 		return
 	}
-	contextDir, err := filepath.Abs(fmt.Sprintf("%s/../../text-fixtures", cwd))
+	contextDir, err := filepath.Abs(fmt.Sprintf("%s/../../test-fixtures", cwd))
 	if err != nil {
 		t.Errorf("Could not get absolute filepath for test fixture: %s", err.Error())
 		return
 	}
 
+	// generating an image name
 	exampleImageName, err := getPrefixedUUID("hello-world")
 	if err != nil {
 		t.Errorf("Could not generate example image name: %s", err.Error())
 		return
 	}
 
+	// building the image
 	if err := client.BuildImage(exampleImageName, contextDir); err != nil {
 		t.Errorf("Could not build example image: %s", err.Error())
 		return
 	}
 
+	// removing the image
 	if err := client.RemoveImage(exampleImageName); err != nil {
 		t.Errorf("Could not remove example image: %s", err.Error())
 		return
