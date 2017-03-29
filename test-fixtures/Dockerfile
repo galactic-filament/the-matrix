@@ -1,3 +1,3 @@
 FROM busybox
 
-CMD "/bin/sh"
+CMD ["echo", "hello", "world"]

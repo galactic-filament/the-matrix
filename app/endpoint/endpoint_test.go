@@ -89,7 +89,7 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 	if !isRunning {
-		t.Errorf("Endpoint container %s was not up", endpoint.Name)
+		t.Errorf("Endpoint container %s was not up:\nayy lmao", endpoint.Name)
 		if err := cleanEndpoint(endpoint); err != nil {
 			t.Errorf("Could not clean endpoint: %s", err.Error())
 			return

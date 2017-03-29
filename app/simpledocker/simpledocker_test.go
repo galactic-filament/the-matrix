@@ -11,6 +11,7 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
+const defaultTestImageOutput = "hello world"
 const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
@@ -376,6 +377,85 @@ func TestIsStillRunning(t *testing.T) {
 	}
 	if err := client.RemoveContainer(container); err != nil {
 		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
+		return
+	}
+}
+
+func TestGetContainerLogs(t *testing.T) {
+	// creating a simpledocker client
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	// gathering context dir for the dockerfile
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Errorf("Could not get working dir: %s", err.Error())
+		return
+	}
+	contextDir, err := filepath.Abs(fmt.Sprintf("%s/../../test-fixtures", cwd))
+	if err != nil {
+		t.Errorf("Could not get absolute filepath for test fixture: %s", err.Error())
+		return
+	}
+
+	// generating an image name
+	exampleImageName, err := util.GetPrefixedUUID("hello-world")
+	if err != nil {
+		t.Errorf("Could not generate example image name: %s", err.Error())
+		return
+	}
+
+	// building the image
+	if err := client.BuildImage(exampleImageName, contextDir); err != nil {
+		t.Errorf("Could not build example image: %s", err.Error())
+		return
+	}
+
+	// starting a container from that image
+	name, err := util.GetPrefixedUUID(defaultTestContainerName)
+	if err != nil {
+		t.Errorf("Could not create prefixed container name: %s", err.Error())
+		return
+	}
+	container, err := client.CreateContainer(name, exampleImageName, []string{})
+	if err != nil {
+		t.Errorf("Could not create a container from the test image: %s", err.Error())
+		return
+	}
+	if err := client.StartContainer(container, []string{}); err != nil {
+		t.Errorf("Could not start test container: %s", err.Error())
+		return
+	}
+
+	// waiting for it to exit
+	if _, err := client.dockerClient.WaitContainer(container.ID); err != nil {
+		t.Errorf("Could not wait for container to exit: %s", err.Error())
+		return
+	}
+
+	// gathering the log output
+	containerOutput, err := client.GetContainerLogs(container)
+	if err != nil {
+		t.Errorf("Could not get container logs: %s", err.Error())
+		return
+	}
+	if containerOutput != defaultTestImageOutput {
+		t.Errorf("Container output did not match the expected output: %s vs %s", defaultTestImageOutput, containerOutput)
+		if err := client.RemoveContainer(container); err != nil {
+			t.Errorf("Could not remove container: %s", err.Error())
+			return
+		}
+
+		return
+	}
+
+	// cleaning up
+	if err := client.RemoveContainer(container); err != nil {
+		t.Errorf("Could not remove container: %s", err.Error())
 		return
 	}
 }
