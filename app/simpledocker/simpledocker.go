@@ -40,6 +40,7 @@ func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 		Stdout:       true,
 		Stderr:       true,
 		OutputStream: &output,
+		RawTerminal:  true,
 	})
 	if err != nil {
 		return "", err
