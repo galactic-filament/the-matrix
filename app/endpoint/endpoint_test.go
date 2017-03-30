@@ -100,8 +100,6 @@ func TestNewEndpoint(t *testing.T) {
 			return
 		}
 
-		t.Logf("output for %s: '%s'", endpoint.Container.ID, containerOutput)
-
 		t.Errorf("Endpoint container %s was not up: %s", endpoint.Name, containerOutput)
 		return
 	}
