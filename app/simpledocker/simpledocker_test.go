@@ -414,8 +414,14 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Could not build example image: %s", err.Error())
 		return
 	}
+	defer func(t *testing.T, client Client, imageName string) {
+		if err := client.RemoveImage(imageName); err != nil {
+			t.Errorf("Could not remove image: %s", err.Error())
+			return
+		}
+	}(t, client, exampleImageName)
 
-	// starting a container from that image
+	// creating the container
 	name, err := util.GetPrefixedUUID(defaultTestContainerName)
 	if err != nil {
 		t.Errorf("Could not create prefixed container name: %s", err.Error())
@@ -426,6 +432,27 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Could not create a container from the test image: %s", err.Error())
 		return
 	}
+	defer func(t *testing.T, client Client, container *docker.Container) {
+		isRunning, err := client.IsRunning(container)
+		if err != nil {
+			t.Errorf("Could not check if container was running: %s", err.Error())
+			return
+		}
+
+		if isRunning {
+			if err := client.StopContainer(container); err != nil {
+				t.Errorf("Could not stop container: %s", err.Error())
+				return
+			}
+		}
+
+		if err := client.RemoveContainer(container); err != nil {
+			t.Errorf("Could not remove container: %s", err.Error())
+			return
+		}
+	}(t, client, container)
+
+	// starting it up
 	if err := client.StartContainer(container, []string{}); err != nil {
 		t.Errorf("Could not start test container: %s", err.Error())
 		return
@@ -445,17 +472,6 @@ func TestGetContainerLogs(t *testing.T) {
 	}
 	if containerOutput != defaultTestImageOutput {
 		t.Errorf("Container output did not match the expected output: %s vs %s", defaultTestImageOutput, containerOutput)
-		if err := client.RemoveContainer(container); err != nil {
-			t.Errorf("Could not remove container: %s", err.Error())
-			return
-		}
-
-		return
-	}
-
-	// cleaning up
-	if err := client.RemoveContainer(container); err != nil {
-		t.Errorf("Could not remove container: %s", err.Error())
 		return
 	}
 }
