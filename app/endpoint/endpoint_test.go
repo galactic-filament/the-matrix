@@ -79,7 +79,7 @@ func TestNewEndpoint(t *testing.T) {
 		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
 		return
 	}
-	defer cleanEndpoint(t, endpoint)
+	// defer cleanEndpoint(t, endpoint)
 
 	// verifying that it is running
 	isRunning, err := client.IsRunning(endpoint.Container)
@@ -100,7 +100,7 @@ func TestNewEndpoint(t *testing.T) {
 			return
 		}
 
-		t.Logf("'%s'", containerOutput)
+		t.Logf("output for %s: '%s'", endpoint.Container.ID, containerOutput)
 
 		t.Errorf("Endpoint container %s was not up: %s", endpoint.Name, containerOutput)
 		return

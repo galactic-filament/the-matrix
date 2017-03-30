@@ -38,6 +38,7 @@ func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 	err := c.dockerClient.Logs(docker.LogsOptions{
 		Container:    container.ID,
 		Stdout:       true,
+		Stderr:       true,
 		OutputStream: &output,
 	})
 	if err != nil {
