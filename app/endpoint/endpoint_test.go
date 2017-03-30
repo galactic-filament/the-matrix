@@ -76,11 +76,6 @@ func TestNewEndpoint(t *testing.T) {
 	// creating the endpoint
 	endpoint, err := NewEndpoint(repo, endpointResources)
 	if err != nil {
-		if err := endpoint.resources.Clean(); err != nil {
-			t.Errorf("Could not clean endpoint resources: %s", err.Error())
-			return
-		}
-
 		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
 		return
 	}
