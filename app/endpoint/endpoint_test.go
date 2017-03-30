@@ -88,7 +88,21 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 	if !isRunning {
-		t.Errorf("Endpoint container %s was not up", endpoint.Name)
+		container, err := client.GetContainer(endpoint.Container.ID)
+		if err != nil {
+			t.Errorf("Could not get container: %s", err.Error())
+			return
+		}
+
+		containerOutput, err := client.GetContainerLogs(container)
+		if err != nil {
+			t.Errorf("Could not fetch container logs: %s", err.Error())
+			return
+		}
+
+		t.Logf("'%s'", containerOutput)
+
+		t.Errorf("Endpoint container %s was not up: %s", endpoint.Name, containerOutput)
 		return
 	}
 }
