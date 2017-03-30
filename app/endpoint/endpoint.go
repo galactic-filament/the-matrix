@@ -31,7 +31,7 @@ func NewEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error)
 	}
 
 	// waiting for the endpoint to start up
-	time.Sleep(10 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	return endpoint, nil
 }
