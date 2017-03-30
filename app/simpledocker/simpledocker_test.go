@@ -38,6 +38,32 @@ func createTestContainer(client Client, namePrefix string, imageName string, lin
 	return containerName, container, err
 }
 
+func cleanupContainer(t *testing.T, client Client, container *docker.Container) {
+	isRunning, err := client.IsRunning(container)
+	if err != nil {
+		t.Errorf("Could not check if container was running: %s", err.Error())
+		return
+	}
+	if isRunning {
+		if err := client.StopContainer(container); err != nil {
+			t.Errorf("Could not stop container: %s", err.Error())
+			return
+		}
+	}
+
+	if err := client.RemoveContainer(container); err != nil {
+		t.Errorf("Could not remove container: %s", err.Error())
+		return
+	}
+}
+
+func cleanupImage(t *testing.T, client Client, imageID string) {
+	if err := client.RemoveImage(imageID); err != nil {
+		t.Errorf("Could not remove image: %s", err.Error())
+		return
+	}
+}
+
 func TestNewDockerClient(t *testing.T) {
 	_, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -72,12 +98,7 @@ func TestCreateContainer(t *testing.T) {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
 	}
-
-	err = client.RemoveContainer(container)
-	if err != nil {
-		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
-		return
-	}
+	defer cleanupContainer(t, client, container)
 }
 
 func TestStartContainer(t *testing.T) {
@@ -93,6 +114,7 @@ func TestStartContainer(t *testing.T) {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
 	}
+	defer cleanupContainer(t, client, container)
 
 	err = client.StartContainer(container, []string{})
 	if err != nil {
@@ -103,12 +125,6 @@ func TestStartContainer(t *testing.T) {
 	_, err = dockerClient.WaitContainer(container.ID)
 	if err != nil {
 		t.Errorf("Could not wait to exit container %s: %s", container.Name, err.Error())
-		return
-	}
-
-	err = client.RemoveContainer(container)
-	if err != nil {
-		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 		return
 	}
 }
@@ -126,13 +142,7 @@ func TestRunContainer(t *testing.T) {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
 	}
-	defer func(t *testing.T, client Client, container *docker.Container) {
-		err = client.RemoveContainer(container)
-		if err != nil {
-			t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
-			return
-		}
-	}(t, client, container)
+	defer cleanupContainer(t, client, container)
 
 	// starting it up via run
 	type runContainerResult struct {
@@ -190,6 +200,7 @@ func TestPullImage(t *testing.T) {
 	if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 		t.Errorf("Could not pull test image %s: %s", defaultTestImage, err.Error())
 	}
+	cleanupImage(t, client, defaultTestImage)
 }
 
 func TestRemoveImage(t *testing.T) {
@@ -253,12 +264,7 @@ func TestBuildImage(t *testing.T) {
 		t.Errorf("Could not build example image: %s", err.Error())
 		return
 	}
-
-	// removing the image
-	if err := client.RemoveImage(exampleImageName); err != nil {
-		t.Errorf("Could not remove example image: %s", err.Error())
-		return
-	}
+	cleanupImage(t, client, exampleImageName)
 }
 
 func TestIsRunning(t *testing.T) {
@@ -281,6 +287,7 @@ func TestIsRunning(t *testing.T) {
 			return
 		}
 	}
+	defer cleanupImage(t, client, defaultTestImage)
 
 	// creating one and starting it up
 	name, err := util.GetPrefixedUUID(defaultTestContainerName)
@@ -293,6 +300,8 @@ func TestIsRunning(t *testing.T) {
 		t.Errorf("Could not create test container from image %s: %s", defaultTestImage, err.Error())
 		return
 	}
+	defer cleanupContainer(t, client, container)
+
 	if err := client.StartContainer(container, []string{}); err != nil {
 		t.Errorf("Could not start container %s: %s", container.Name, err.Error())
 		return
@@ -309,12 +318,6 @@ func TestIsRunning(t *testing.T) {
 	}
 	if isRunning {
 		t.Errorf("Container %s was found to be running when it should not have been", container.Name)
-		return
-	}
-
-	// cleaning it up
-	if err := client.RemoveContainer(container); err != nil {
-		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 		return
 	}
 }
@@ -339,6 +342,7 @@ func TestIsStillRunning(t *testing.T) {
 			return
 		}
 	}
+	defer cleanupImage(t, client, defaultDbImage)
 
 	// creating one and starting it up
 	name, err := util.GetPrefixedUUID(defaultTestContainerName)
@@ -351,6 +355,8 @@ func TestIsStillRunning(t *testing.T) {
 		t.Errorf("Could not create test container from image %s: %s", defaultDbImage, err.Error())
 		return
 	}
+	defer cleanupContainer(t, client, container)
+
 	if err := client.StartContainer(container, []string{}); err != nil {
 		t.Errorf("Could not start container %s: %s", container.Name, err.Error())
 		return
@@ -367,16 +373,6 @@ func TestIsStillRunning(t *testing.T) {
 	}
 	if !isRunning {
 		t.Errorf("Container %s was found to be not running when it should have been", container.Name)
-		return
-	}
-
-	// cleaning it up
-	if err := client.StopContainer(container); err != nil {
-		t.Errorf("Could not stop container %s: %s", container.Name, err.Error())
-		return
-	}
-	if err := client.RemoveContainer(container); err != nil {
-		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 		return
 	}
 }
@@ -414,12 +410,7 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Could not build example image: %s", err.Error())
 		return
 	}
-	defer func(t *testing.T, client Client, imageName string) {
-		if err := client.RemoveImage(imageName); err != nil {
-			t.Errorf("Could not remove image: %s", err.Error())
-			return
-		}
-	}(t, client, exampleImageName)
+	defer cleanupImage(t, client, exampleImageName)
 
 	// creating the container
 	name, err := util.GetPrefixedUUID(defaultTestContainerName)
@@ -432,25 +423,7 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Could not create a container from the test image: %s", err.Error())
 		return
 	}
-	defer func(t *testing.T, client Client, container *docker.Container) {
-		isRunning, err := client.IsRunning(container)
-		if err != nil {
-			t.Errorf("Could not check if container was running: %s", err.Error())
-			return
-		}
-
-		if isRunning {
-			if err := client.StopContainer(container); err != nil {
-				t.Errorf("Could not stop container: %s", err.Error())
-				return
-			}
-		}
-
-		if err := client.RemoveContainer(container); err != nil {
-			t.Errorf("Could not remove container: %s", err.Error())
-			return
-		}
-	}(t, client, container)
+	defer cleanupContainer(t, client, container)
 
 	// starting it up
 	if err := client.StartContainer(container, []string{}); err != nil {
