@@ -11,7 +11,7 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
-const defaultTestImageOutput = "hello world"
+const defaultTestImageOutput = "hello world\n"
 const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
@@ -443,6 +443,8 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Could not get container logs: %s", err.Error())
 		return
 	}
+	t.Logf("'%s'", containerOutput)
+	t.Logf("'%s'", defaultTestImageOutput)
 	if containerOutput != defaultTestImageOutput {
 		t.Errorf("Container output did not match the expected output: %s vs %s", defaultTestImageOutput, containerOutput)
 		return
