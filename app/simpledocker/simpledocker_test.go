@@ -126,6 +126,13 @@ func TestRunContainer(t *testing.T) {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
 	}
+	defer func(t *testing.T, client Client, container *docker.Container) {
+		err = client.RemoveContainer(container)
+		if err != nil {
+			t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
+			return
+		}
+	}(t, client, container)
 
 	// starting it up via run
 	type runContainerResult struct {
@@ -142,13 +149,6 @@ func TestRunContainer(t *testing.T) {
 	result := <-runOut
 	if err := result.err; err != nil {
 		t.Errorf("Could not run container %s: %s", container.Name, err.Error())
-		return
-	}
-
-	// cleaning it up
-	err = client.RemoveContainer(container)
-	if err != nil {
-		t.Errorf("Could not remove container %s: %s", container.Name, err.Error())
 		return
 	}
 }
