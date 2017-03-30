@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"path/filepath"
 	"testing"
 
 	"fmt"
@@ -25,7 +26,11 @@ func TestNewResource(t *testing.T) {
 		t.Errorf("Could not get working dir: %s", err.Error())
 		return
 	}
-	resourceDir := fmt.Sprintf("%s/../../%s", cwd, defaultResourceName)
+	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, defaultResourceName))
+	if err != nil {
+		t.Errorf("Could not generate abs resource dir filepath: %s", err.Error())
+		return
+	}
 
 	resource, err := NewResource(client, Opts{
 		Name:                 defaultResourceName,
