@@ -10,14 +10,16 @@ import (
 	"github.com/ihsw/the-matrix/app/resource"
 )
 
+func getContainerName(name string) string { return fmt.Sprintf("%s-endpoint", name) }
+
 // NewEndpoint - creates a new endpoint for a client to consume
-func NewEndpoint(repo repo.Repo, resources resource.Resources) (Endpoint, error) {
-	endpoint := Endpoint{repo, nil}
+func NewEndpoint(endpointRepo repo.Repo, resources resource.Resources) (Endpoint, error) {
+	endpoint := Endpoint{endpointRepo, nil}
 
 	// creating an endpoint container
-	container, err := repo.Client.CreateContainer(
-		fmt.Sprintf("%s-endpoint", endpoint.Name),
-		fmt.Sprintf("ihsw/%s", endpoint.Name),
+	container, err := endpointRepo.Client.CreateContainer(
+		getContainerName(endpoint.Name),
+		repo.GetImageID(endpoint.Name),
 		resources.GetEnvVarsList(),
 	)
 	if err != nil {
