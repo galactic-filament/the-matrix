@@ -79,7 +79,7 @@ func TestNewEndpoint(t *testing.T) {
 		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
 		return
 	}
-	// defer cleanEndpoint(t, endpoint)
+	defer cleanEndpoint(t, endpoint)
 
 	// verifying that it is running
 	isRunning, err := client.IsRunning(endpoint.Container)
@@ -88,13 +88,7 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 	if !isRunning {
-		container, err := client.GetContainer(endpoint.Container.ID)
-		if err != nil {
-			t.Errorf("Could not get container: %s", err.Error())
-			return
-		}
-
-		containerOutput, err := client.GetContainerLogs(container)
+		containerOutput, err := client.GetContainerLogs(endpoint.Container)
 		if err != nil {
 			t.Errorf("Could not fetch container logs: %s", err.Error())
 			return
