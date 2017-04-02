@@ -3,6 +3,8 @@ package simpledocker
 import (
 	"bytes"
 
+	"fmt"
+
 	"github.com/fsouza/go-dockerclient"
 )
 
@@ -34,19 +36,22 @@ func (c Client) CreateContainer(name string, image string, envVars []string) (*d
 
 // GetContainerLogs - fetches the logs for a given container
 func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
-	var output bytes.Buffer
+	var (
+		stdOut bytes.Buffer
+		stdErr bytes.Buffer
+	)
 	err := c.dockerClient.Logs(docker.LogsOptions{
 		Container:    container.ID,
 		Stdout:       true,
+		OutputStream: &stdOut,
 		Stderr:       true,
-		OutputStream: &output,
-		RawTerminal:  true,
+		ErrorStream:  &stdErr,
 	})
 	if err != nil {
 		return "", err
 	}
 
-	return output.String(), nil
+	return fmt.Sprintf("%s%s", stdOut.String(), stdErr.String()), nil
 }
 
 // StartContainer - starts a container up
