@@ -12,7 +12,6 @@ const defaultTestImageOutput = "hello world\n"
 const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
 const defaultDbImage = "postgres"
-const defaultNetworkDriver = "bridge"
 
 func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
 	containerName, err := util.GetPrefixedUUID(namePrefix)

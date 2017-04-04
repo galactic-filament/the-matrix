@@ -7,6 +7,8 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
+const defaultNetworkDriver = "bridge"
+
 func TestCreateNetwork(t *testing.T) {
 	// creating a simpledocker client
 	dockerClient, err := docker.NewClientFromEnv()
