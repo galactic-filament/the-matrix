@@ -16,6 +16,7 @@ const defaultTestContainerName = "test-container"
 const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
 const defaultDbImage = "postgres"
+const defaultNetworkDriver = "bridge"
 
 func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
 	containerName, err := util.GetPrefixedUUID(namePrefix)
@@ -60,6 +61,13 @@ func cleanupContainer(t *testing.T, client Client, container *docker.Container) 
 func cleanupImage(t *testing.T, client Client, imageID string) {
 	if err := client.RemoveImage(imageID); err != nil {
 		t.Errorf("Could not remove image: %s", err.Error())
+		return
+	}
+}
+
+func cleanupNetwork(t *testing.T, client Client, network *docker.Network) {
+	if err := client.RemoveNetwork(network); err != nil {
+		t.Errorf("Could not remove network: %s", err.Error())
 		return
 	}
 }
@@ -447,4 +455,26 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Container output did not match the expected output: %s vs %s", defaultTestImageOutput, containerOutput)
 		return
 	}
+}
+
+func TestCreateNetwork(t *testing.T) {
+	// creating a simpledocker client
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	networkName, err := util.GetPrefixedUUID("test-network")
+	if err != nil {
+		t.Errorf("Could not generate network name: %s", err.Error())
+		return
+	}
+	network, err := client.CreateNetwork(networkName, defaultNetworkDriver)
+	if err != nil {
+		t.Errorf("Could not create network: %s", err.Error())
+		return
+	}
+	defer cleanupNetwork(t, client, network)
 }
