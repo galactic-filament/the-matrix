@@ -23,3 +23,10 @@ func (c Client) RemoveNetwork(network *docker.Network) error {
 
 	return nil
 }
+
+// Connect - connects a container to a network
+func (c Client) Connect(network *docker.Network, container *docker.Container) error {
+	return c.dockerClient.ConnectNetwork(network.ID, docker.NetworkConnectionOptions{
+		Container: container.ID,
+	})
+}

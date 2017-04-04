@@ -7,7 +7,29 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
+const defaultTestNetworkName = "test-network"
 const defaultNetworkDriver = "bridge"
+
+func createTestNetwork(client Client, namePrefix string, driver string) (*docker.Network, error) {
+	name, err := util.GetPrefixedUUID(namePrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	network, err := client.CreateNetwork(name, driver)
+	if err != nil {
+		return nil, err
+	}
+
+	return network, nil
+}
+
+func cleanupNetwork(t *testing.T, client Client, network *docker.Network) {
+	if err := client.RemoveNetwork(network); err != nil {
+		t.Errorf("Could not remove network: %s", err.Error())
+		return
+	}
+}
 
 func TestCreateNetwork(t *testing.T) {
 	// creating a simpledocker client
@@ -18,15 +40,40 @@ func TestCreateNetwork(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	networkName, err := util.GetPrefixedUUID("test-network")
-	if err != nil {
-		t.Errorf("Could not generate network name: %s", err.Error())
-		return
-	}
-	network, err := client.CreateNetwork(networkName, defaultNetworkDriver)
+	network, err := createTestNetwork(client, defaultTestNetworkName, defaultNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
 	}
 	defer cleanupNetwork(t, client, network)
+}
+
+func TestConnect(t *testing.T) {
+	// creating a simpledocker client
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	network, err := createTestNetwork(client, defaultTestNetworkName, defaultNetworkDriver)
+	if err != nil {
+		t.Errorf("Could not create network: %s", err.Error())
+		return
+	}
+	defer cleanupNetwork(t, client, network)
+
+	_, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	if err != nil {
+		t.Errorf("Could not create container: %s", err.Error())
+		return
+	}
+	defer cleanupContainer(t, client, container)
+
+	err = client.Connect(network, container)
+	if err != nil {
+		t.Errorf("Could not connect container to network: %s", err.Error())
+		return
+	}
 }

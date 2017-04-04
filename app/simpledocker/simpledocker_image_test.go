@@ -10,6 +10,18 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
+const defaultTestImageOutput = "hello world\n"
+const defaultTestImage = "hello-world"
+const defaultTestImageTag = "latest"
+const defaultDbImage = "postgres"
+
+func cleanupImage(t *testing.T, client Client, imageID string) {
+	if err := client.RemoveImage(imageID); err != nil {
+		t.Errorf("Could not remove image: %s", err.Error())
+		return
+	}
+}
+
 func TestHasImage(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
