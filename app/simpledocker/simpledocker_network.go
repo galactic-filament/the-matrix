@@ -24,9 +24,17 @@ func (c Client) RemoveNetwork(network *docker.Network) error {
 	return nil
 }
 
+// GetNetwork - fetches a docker network
+func (c Client) GetNetwork(id string) (*docker.Network, error) { return c.dockerClient.NetworkInfo(id) }
+
 // Connect - connects a container to a network
-func (c Client) Connect(network *docker.Network, container *docker.Container) error {
-	return c.dockerClient.ConnectNetwork(network.ID, docker.NetworkConnectionOptions{
+func (c Client) Connect(network *docker.Network, container *docker.Container) (*docker.Network, error) {
+	err := c.dockerClient.ConnectNetwork(network.ID, docker.NetworkConnectionOptions{
 		Container: container.ID,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	return c.GetNetwork(network.ID)
 }

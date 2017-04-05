@@ -49,7 +49,6 @@ func TestCreateNetwork(t *testing.T) {
 }
 
 func TestConnect(t *testing.T) {
-	// creating a simpledocker client
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Errorf("Could not create a new docker client: %s", err.Error())
@@ -64,16 +63,38 @@ func TestConnect(t *testing.T) {
 	}
 	defer cleanupNetwork(t, client, network)
 
-	_, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	hasImage, err := client.HasImage(defaultDbImage)
+	if err != nil {
+		t.Errorf("Could not check if image exists: %s", err.Error())
+		return
+	}
+	if !hasImage {
+		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
+			t.Errorf("Could not pull image: %s", err.Error())
+			return
+		}
+	}
+
+	_, container, err := createTestContainer(client, defaultTestContainerName, defaultDbImage, []string{})
 	if err != nil {
 		t.Errorf("Could not create container: %s", err.Error())
 		return
 	}
 	defer cleanupContainer(t, client, container)
 
-	err = client.Connect(network, container)
+	if err := client.StartContainer(container, []string{}); err != nil {
+		t.Errorf("Could not start container: %s", err.Error())
+		return
+	}
+
+	network, err = client.Connect(network, container)
 	if err != nil {
 		t.Errorf("Could not connect container to network: %s", err.Error())
+		return
+	}
+
+	if len(network.Containers) != 1 {
+		t.Errorf("Could not validate that conatiner was connected to network")
 		return
 	}
 }
