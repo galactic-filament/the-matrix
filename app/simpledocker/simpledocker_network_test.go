@@ -81,7 +81,6 @@ func TestConnect(t *testing.T) {
 		return
 	}
 	defer cleanupContainer(t, client, container)
-
 	if err := client.StartContainer(container, []string{}); err != nil {
 		t.Errorf("Could not start container: %s", err.Error())
 		return
@@ -92,7 +91,6 @@ func TestConnect(t *testing.T) {
 		t.Errorf("Could not connect container to network: %s", err.Error())
 		return
 	}
-
 	if len(network.Containers) != 1 {
 		t.Errorf("Could not validate that conatiner was connected to network")
 		return
