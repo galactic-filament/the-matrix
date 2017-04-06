@@ -8,14 +8,8 @@ import (
 )
 
 // CreateContainer - creates a container but doesn't start it up
-func (c Client) CreateContainer(name string, image string, envVars []string) (*docker.Container, error) {
-	container, err := c.dockerClient.CreateContainer(docker.CreateContainerOptions{
-		Name: name,
-		Config: &docker.Config{
-			Image: image,
-			Env:   envVars,
-		},
-	})
+func (c Client) CreateContainer(opts CreateContainerOptions) (*docker.Container, error) {
+	container, err := c.dockerClient.CreateContainer(opts.toDockerOpts())
 	if err != nil {
 		return nil, err
 	}
@@ -102,4 +96,34 @@ func (c Client) IsRunning(container *docker.Container) (bool, error) {
 	}
 
 	return container.State.Running, nil
+}
+
+// CreateContainerOptions - options for CreateContainer
+type CreateContainerOptions struct {
+	Name    string
+	Image   string
+	Network *docker.Network
+	EnvVars map[string]string
+}
+
+func (c CreateContainerOptions) toDockerOpts() docker.CreateContainerOptions {
+	envVars := []string{}
+	for k, v := range c.EnvVars {
+		envVars = append(envVars, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	var networkingConfig *docker.NetworkingConfig
+	if c.Network != nil {
+		networkingConfig = &docker.NetworkingConfig{
+			EndpointsConfig: map[string]*docker.EndpointConfig{
+				c.Network.Name: &docker.EndpointConfig{NetworkID: c.Network.ID},
+			},
+		}
+	}
+
+	return docker.CreateContainerOptions{
+		Name:             c.Name,
+		Config:           &docker.Config{Image: c.Image, Env: envVars},
+		NetworkingConfig: networkingConfig,
+	}
 }

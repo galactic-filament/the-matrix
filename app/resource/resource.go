@@ -33,7 +33,7 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	if err != nil {
 		return Resource{}, err
 	}
-	container, err := client.CreateContainer(containerID, imageID, []string{})
+	container, err := client.CreateContainer(simpledocker.CreateContainerOptions{Name: containerID, Image: imageID})
 	if err != nil {
 		return Resource{}, err
 	}

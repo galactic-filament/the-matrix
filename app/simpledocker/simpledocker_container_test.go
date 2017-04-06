@@ -13,24 +13,24 @@ import (
 
 const defaultTestContainerName = "test-container"
 
-func createTestContainer(client Client, namePrefix string, imageName string, links []string) (string, *docker.Container, error) {
+func createTestContainer(client Client, namePrefix string, imageName string) (string, *docker.Container, error) {
 	containerName, err := util.GetPrefixedUUID(namePrefix)
 	if err != nil {
 		return "", nil, err
 	}
 
-	hasImage, err := client.HasImage(defaultTestImage)
+	hasImage, err := client.HasImage(imageName)
 	if err != nil {
 		return "", nil, err
 	}
 
 	if !hasImage {
-		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
+		if err := client.PullImage(imageName, defaultTestImageTag); err != nil {
 			return "", nil, err
 		}
 	}
 
-	container, err := client.CreateContainer(containerName, imageName, links)
+	container, err := client.CreateContainer(CreateContainerOptions{Name: containerName, Image: imageName})
 	return containerName, container, err
 }
 
@@ -61,7 +61,7 @@ func TestCreateContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage)
 	if err != nil {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
@@ -77,7 +77,7 @@ func TestStartContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage)
 	if err != nil {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
@@ -105,7 +105,7 @@ func TestRunContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, []string{})
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage)
 	if err != nil {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
@@ -159,7 +159,7 @@ func TestIsRunning(t *testing.T) {
 		t.Errorf("Could not create prefixed container name: %s", err.Error())
 		return
 	}
-	container, err := client.CreateContainer(name, defaultTestImage, []string{})
+	container, err := client.CreateContainer(CreateContainerOptions{Name: name, Image: defaultTestImage})
 	if err != nil {
 		t.Errorf("Could not create test container from image %s: %s", defaultTestImage, err.Error())
 		return
@@ -214,7 +214,7 @@ func TestIsStillRunning(t *testing.T) {
 		t.Errorf("Could not create prefixed container name: %s", err.Error())
 		return
 	}
-	container, err := client.CreateContainer(name, defaultDbImage, []string{})
+	container, err := client.CreateContainer(CreateContainerOptions{Name: name, Image: defaultDbImage})
 	if err != nil {
 		t.Errorf("Could not create test container from image %s: %s", defaultDbImage, err.Error())
 		return
@@ -282,7 +282,7 @@ func TestGetContainerLogs(t *testing.T) {
 		t.Errorf("Could not create prefixed container name: %s", err.Error())
 		return
 	}
-	container, err := client.CreateContainer(name, exampleImageName, []string{})
+	container, err := client.CreateContainer(CreateContainerOptions{Name: name, Image: exampleImageName})
 	if err != nil {
 		t.Errorf("Could not create a container from the test image: %s", err.Error())
 		return

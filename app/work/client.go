@@ -8,6 +8,7 @@ import (
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/client"
 	"github.com/ihsw/the-matrix/app/endpoint"
+	"github.com/ihsw/the-matrix/app/simpledocker"
 	"github.com/ihsw/the-matrix/app/util"
 )
 
@@ -80,11 +81,10 @@ func runClient(c client.Client, e endpoint.Endpoint) (*client.TestOutput, error)
 	}).Info("Running client")
 
 	endpointHostname := "ApiServer"
-	clientContainer, err := c.Client.CreateContainer(
-		fmt.Sprintf("%s-%s-client", e.Name, c.Name),
-		fmt.Sprintf("ihsw/%s", c.Name),
-		[]string{fmt.Sprintf("API_HOST=%s", endpointHostname)},
-	)
+	clientContainer, err := c.Client.CreateContainer(simpledocker.CreateContainerOptions{
+		Name:  fmt.Sprintf("%s-%s-client", e.Name, c.Name),
+		Image: fmt.Sprintf("ihsw/%s", c.Name),
+	})
 	if err != nil {
 		return nil, err
 	}

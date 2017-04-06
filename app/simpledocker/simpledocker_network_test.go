@@ -75,7 +75,7 @@ func TestConnect(t *testing.T) {
 		}
 	}
 
-	_, container, err := createTestContainer(client, defaultTestContainerName, defaultDbImage, []string{})
+	_, container, err := createTestContainer(client, defaultTestContainerName, defaultDbImage)
 	if err != nil {
 		t.Errorf("Could not create container: %s", err.Error())
 		return

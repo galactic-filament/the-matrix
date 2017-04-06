@@ -8,6 +8,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
+	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
 func getContainerName(name string) string { return fmt.Sprintf("%s-endpoint", name) }
@@ -17,11 +18,10 @@ func NewEndpoint(endpointRepo repo.Repo, resources resource.Resources) (Endpoint
 	endpoint := Endpoint{endpointRepo, nil}
 
 	// creating an endpoint container
-	container, err := endpointRepo.Client.CreateContainer(
-		getContainerName(endpoint.Name),
-		repo.GetImageID(endpoint.Name),
-		resources.GetEnvVarsList(),
-	)
+	container, err := endpointRepo.Client.CreateContainer(simpledocker.CreateContainerOptions{
+		Name:  getContainerName(endpoint.Name),
+		Image: repo.GetImageID(endpoint.Name),
+	})
 	if err != nil {
 		return Endpoint{}, err
 	}
