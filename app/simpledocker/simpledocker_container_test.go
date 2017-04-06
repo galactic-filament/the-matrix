@@ -206,7 +206,6 @@ func TestIsStillRunning(t *testing.T) {
 			return
 		}
 	}
-	defer cleanupImage(t, client, defaultDbImage)
 
 	// creating one and starting it up
 	name, err := util.GetPrefixedUUID(defaultTestContainerName)
