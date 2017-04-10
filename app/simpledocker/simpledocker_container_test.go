@@ -13,7 +13,7 @@ import (
 
 const defaultTestContainerName = "test-container"
 
-func createTestContainer(client Client, namePrefix string, imageName string) (string, *docker.Container, error) {
+func createTestContainer(client Client, namePrefix string, imageName string, network *docker.Network) (string, *docker.Container, error) {
 	containerName, err := util.GetPrefixedUUID(namePrefix)
 	if err != nil {
 		return "", nil, err
@@ -30,7 +30,7 @@ func createTestContainer(client Client, namePrefix string, imageName string) (st
 		}
 	}
 
-	container, err := client.CreateContainer(CreateContainerOptions{Name: containerName, Image: imageName})
+	container, err := client.CreateContainer(CreateContainerOptions{Name: containerName, Image: imageName, Network: network})
 	return containerName, container, err
 }
 
@@ -61,7 +61,7 @@ func TestCreateContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage)
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, nil)
 	if err != nil {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
@@ -77,7 +77,7 @@ func TestStartContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage)
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, nil)
 	if err != nil {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return
@@ -105,7 +105,7 @@ func TestRunContainer(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage)
+	containerName, container, err := createTestContainer(client, defaultTestContainerName, defaultTestImage, nil)
 	if err != nil {
 		t.Errorf("Could not create %s container: %s", containerName, err.Error())
 		return

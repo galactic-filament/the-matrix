@@ -3,6 +3,8 @@ package simpledocker
 import (
 	"testing"
 
+	"time"
+
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/util"
 )
@@ -75,7 +77,7 @@ func TestConnect(t *testing.T) {
 		}
 	}
 
-	_, container, err := createTestContainer(client, defaultTestContainerName, defaultDbImage)
+	_, container, err := createTestContainer(client, defaultTestContainerName, defaultDbImage, nil)
 	if err != nil {
 		t.Errorf("Could not create container: %s", err.Error())
 		return
@@ -86,9 +88,80 @@ func TestConnect(t *testing.T) {
 		return
 	}
 
+	time.Sleep(5 * time.Second)
+	isRunning, err := client.IsRunning(container)
+	if err != nil {
+		t.Errorf("Could not check if container was still running: %s", err.Error())
+		return
+	}
+	if !isRunning {
+		t.Errorf("Container was not still up after 5s")
+		return
+	}
+
 	network, err = client.Connect(network, container)
 	if err != nil {
 		t.Errorf("Could not connect container to network: %s", err.Error())
+		return
+	}
+	if len(network.Containers) != 1 {
+		t.Errorf("Could not validate that conatiner was connected to network")
+		return
+	}
+}
+
+func TestCreateContainerWithNetwork(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	network, err := createTestNetwork(client, defaultTestNetworkName, defaultNetworkDriver)
+	if err != nil {
+		t.Errorf("Could not create network: %s", err.Error())
+		return
+	}
+	defer cleanupNetwork(t, client, network)
+
+	hasImage, err := client.HasImage(defaultDbImage)
+	if err != nil {
+		t.Errorf("Could not check if image exists: %s", err.Error())
+		return
+	}
+	if !hasImage {
+		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
+			t.Errorf("Could not pull image: %s", err.Error())
+			return
+		}
+	}
+
+	_, container, err := createTestContainer(client, defaultTestContainerName, defaultDbImage, network)
+	if err != nil {
+		t.Errorf("Could not create container: %s", err.Error())
+		return
+	}
+	defer cleanupContainer(t, client, container)
+	if err := client.StartContainer(container, []string{}); err != nil {
+		t.Errorf("Could not start container: %s", err.Error())
+		return
+	}
+
+	time.Sleep(5 * time.Second)
+	isRunning, err := client.IsRunning(container)
+	if err != nil {
+		t.Errorf("Could not check if container was still running: %s", err.Error())
+		return
+	}
+	if !isRunning {
+		t.Errorf("Container was not still up after 5s")
+		return
+	}
+
+	network, err = client.GetNetwork(network.ID)
+	if err != nil {
+		t.Errorf("Could not fetch network network: %s", err.Error())
 		return
 	}
 	if len(network.Containers) != 1 {
