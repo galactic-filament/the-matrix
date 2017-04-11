@@ -3,6 +3,7 @@ package resource
 import (
 	"errors"
 	"fmt"
+	"net"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
@@ -18,7 +19,7 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 		client:        client,
 		network:       opts.Network,
 		name:          opts.Name,
-		endpointLabel: opts.EndpointLabel,
+		EndpointLabel: opts.EndpointLabel,
 	}
 	imageID := getImageName(r.name)
 
@@ -70,7 +71,7 @@ type Resource struct {
 	network       *docker.Network
 	container     *docker.Container
 	name          string
-	endpointLabel string
+	EndpointLabel string
 }
 
 // Clean - stops and removes the Resource's container
@@ -88,4 +89,9 @@ func (r Resource) Clean() error {
 	}
 
 	return nil
+}
+
+// GetContainerIP - returns ip address of resource container in the resource's network
+func (r Resource) GetContainerIP() (net.IP, error) {
+	return r.client.GetContainerIP(r.network, r.container)
 }
