@@ -10,12 +10,12 @@ import (
 )
 
 func getContainerID(name string) string { return fmt.Sprintf("%s-resource", name) }
-func getImageID(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
+func getImageName(name string) string   { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
 
 // NewResource - creates a new resource based on a dockerfile, optionally building it where it does not exist
 func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	r := Resource{client, opts.Name, opts.Network, nil}
-	imageID := getImageID(r.name)
+	imageID := getImageName(r.name)
 
 	// validating that the resource image exists, if not then building it
 	hasImage, err := client.HasImage(imageID)
