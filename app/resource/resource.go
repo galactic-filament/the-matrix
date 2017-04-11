@@ -14,7 +14,12 @@ func getImageName(name string) string   { return fmt.Sprintf("ihsw/the-matrix-%s
 
 // NewResource - creates a new resource based on a dockerfile, optionally building it where it does not exist
 func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
-	r := Resource{client, opts.Name, opts.Network, nil}
+	r := Resource{
+		client:        client,
+		network:       opts.Network,
+		name:          opts.Name,
+		endpointLabel: opts.EndpointLabel,
+	}
 	imageID := getImageName(r.name)
 
 	// validating that the resource image exists, if not then building it
@@ -56,14 +61,16 @@ type Opts struct {
 	Name                 string
 	DockerfileContextDir string
 	Network              *docker.Network
+	EndpointLabel        string
 }
 
 // Resource - a container for each Endpoint to use (database, etc)
 type Resource struct {
-	client    simpledocker.Client
-	name      string
-	network   *docker.Network
-	container *docker.Container
+	client        simpledocker.Client
+	network       *docker.Network
+	container     *docker.Container
+	name          string
+	endpointLabel string
 }
 
 // Clean - stops and removes the Resource's container
