@@ -12,6 +12,36 @@ import (
 )
 
 const defaultResourceName = "db"
+const defaultTestNetworkName = "galaxy"
+const defaultTestNetworkDriver = "bridge"
+
+func getTestResource(client simpledocker.Client, relativePath string, name string, network *docker.Network) (Resource, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return Resource{}, err
+	}
+	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/%s", cwd, relativePath))
+	if err != nil {
+		return Resource{}, err
+	}
+
+	resource, err := NewResource(client, Opts{
+		Name:                 name,
+		DockerfileContextDir: resourceDir,
+	})
+	if err != nil {
+		return Resource{}, err
+	}
+
+	return resource, nil
+}
+
+func cleanResource(t *testing.T, resource Resource) {
+	if err := resource.Clean(); err != nil {
+		t.Errorf("Could not clean resource %s: %s", resource.name, err.Error())
+		return
+	}
+}
 
 func TestNewResource(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
@@ -21,28 +51,48 @@ func TestNewResource(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	cwd, err := os.Getwd()
+	resource, err := getTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, nil)
 	if err != nil {
-		t.Errorf("Could not get working dir: %s", err.Error())
+		t.Errorf("Could not create test resource: %s", err.Error())
 		return
 	}
-	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, defaultResourceName))
-	if err != nil {
-		t.Errorf("Could not generate abs resource dir filepath: %s", err.Error())
-		return
-	}
+	defer cleanResource(t, resource)
+}
 
-	resource, err := NewResource(client, Opts{
-		Name:                 defaultResourceName,
-		DockerfileContextDir: resourceDir,
-	})
+func TestGetContainerIP(t *testing.T) {
+	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
-		t.Errorf("Could not create resource %s: %s", defaultResourceName, err.Error())
+		t.Errorf("Could not create a new docker client: %s", err.Error())
 		return
 	}
+	client := simpledocker.NewClient(dockerClient)
 
-	if err := resource.Clean(); err != nil {
-		t.Errorf("Could not clean resource %s: %s", resource.name, err.Error())
+	network, err := client.CreateNetwork(defaultTestNetworkName, defaultTestNetworkDriver)
+	if err != nil {
+		t.Errorf("Could not create network: %s", err.Error())
+		return
+	}
+	defer func(t *testing.T, client simpledocker.Client, network *docker.Network) {
+		if err := client.RemoveNetwork(network); err != nil {
+			t.Errorf("Could not remove network: %s", err.Error())
+			return
+		}
+	}(t, client, network)
+
+	resource, err := getTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, network)
+	if err != nil {
+		t.Errorf("Could not create test resource: %s", err.Error())
+		return
+	}
+	defer cleanResource(t, resource)
+
+	ip, err := resource.GetContainerIP()
+	if err != nil {
+		t.Errorf("Could not get resource IP: %s", err.Error())
+		return
+	}
+	if ip == nil {
+		t.Errorf("Resource IP was nil")
 		return
 	}
 }
