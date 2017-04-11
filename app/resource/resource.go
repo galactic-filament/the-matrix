@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
@@ -53,6 +54,9 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	if err := r.client.StartContainer(container, []string{}); err != nil {
 		return Resource{}, err
 	}
+
+	// waiting for the resource to start up
+	time.Sleep(5 * time.Second)
 
 	return r, nil
 }
