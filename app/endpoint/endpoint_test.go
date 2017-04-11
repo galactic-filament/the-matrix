@@ -75,6 +75,7 @@ func TestNewEndpoint(t *testing.T) {
 		Name:                 defaultResourceName,
 		DockerfileContextDir: resourceDir,
 		Network:              network,
+		EndpointLabel:        "DATABASE",
 	}})
 	if err != nil {
 		t.Errorf("Could not create a new resource with default resource %s: %s", defaultResourceName, err.Error())

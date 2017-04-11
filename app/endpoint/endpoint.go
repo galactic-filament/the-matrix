@@ -20,11 +20,23 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 		Network: network,
 	}
 
+	// gathering the host addresses of resources
+	endpointEnvVars := map[string]string{}
+	for _, resource := range resources.Values {
+		ip, err := resource.GetContainerIP()
+		if err != nil {
+			return Endpoint{}, err
+		}
+
+		endpointEnvVars[fmt.Sprintf("%s_HOST", resource.EndpointLabel)] = ip.String()
+	}
+
 	// creating an endpoint container
 	container, err := endpointRepo.Client.CreateContainer(simpledocker.CreateContainerOptions{
 		Name:    getContainerName(endpoint.Name),
 		Image:   repo.GetImageID(endpoint.Name),
 		Network: network,
+		EnvVars: endpointEnvVars,
 	})
 	if err != nil {
 		return Endpoint{}, err
