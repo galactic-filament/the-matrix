@@ -12,6 +12,8 @@ import (
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
+const defaultTestNetworkName = "galaxy"
+const defaultTestNetworkDriver = "bridge"
 const defaultResourceName = "db"
 const defaultRepoName = "es-bueno"
 
@@ -38,6 +40,22 @@ func TestNewEndpoint(t *testing.T) {
 	client := simpledocker.NewClient(dockerClient)
 
 	/**
+	 * resource and endpoint network
+	 */
+	// creating the network
+	network, err := client.CreateNetwork(defaultTestNetworkName, defaultTestNetworkDriver)
+	if err != nil {
+		t.Errorf("Could not create network: %s", err.Error())
+		return
+	}
+	defer func(t *testing.T, client simpledocker.Client, network *docker.Network) {
+		if err := client.RemoveNetwork(network); err != nil {
+			t.Errorf("Could not remove network: %s", err.Error())
+			return
+		}
+	}(t, client, network)
+
+	/**
 	 * endpoint resources
 	 */
 	// creating the resource dir
@@ -56,6 +74,7 @@ func TestNewEndpoint(t *testing.T) {
 	endpointResources, err := resource.NewResources(client, []resource.Opts{resource.Opts{
 		Name:                 defaultResourceName,
 		DockerfileContextDir: resourceDir,
+		Network:              network,
 	}})
 	if err != nil {
 		t.Errorf("Could not create a new resource with default resource %s: %s", defaultResourceName, err.Error())
@@ -73,7 +92,7 @@ func TestNewEndpoint(t *testing.T) {
 	}
 
 	// creating the endpoint
-	endpoint, err := NewEndpoint(repo, endpointResources)
+	endpoint, err := NewEndpoint(repo, network, endpointResources)
 	if err != nil {
 		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
 		return

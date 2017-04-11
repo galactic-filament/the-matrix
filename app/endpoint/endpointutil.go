@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
 	"github.com/ihsw/the-matrix/app/util"
@@ -12,13 +13,13 @@ type endpointTask struct {
 }
 
 // NewEndpoints - creates a new list of endpoints
-func NewEndpoints(repos []repo.Repo, resources resource.Resources) ([]Endpoint, error) {
+func NewEndpoints(repos []repo.Repo, network *docker.Network, resources resource.Resources) ([]Endpoint, error) {
 	// setting up the workers
 	in := make(chan repo.Repo)
 	out := make(chan endpointTask)
 	worker := func() {
 		for repo := range in {
-			endpoint, err := NewEndpoint(repo, resources)
+			endpoint, err := NewEndpoint(repo, network, resources)
 			out <- endpointTask{endpoint, err}
 		}
 	}
