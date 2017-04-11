@@ -28,7 +28,7 @@ func NewEndpoint(endpointRepo repo.Repo, resources resource.Resources) (Endpoint
 	endpoint.Container = container
 
 	// starting it up with links to the provided resources
-	if err := endpoint.Client.StartContainer(container, resources.GetLinkLineList()); err != nil {
+	if err := endpoint.Client.StartContainer(container, []string{}); err != nil {
 		return Endpoint{}, err
 	}
 

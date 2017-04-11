@@ -14,7 +14,7 @@ func getImageID(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s
 
 // NewResource - creates a new resource based on a dockerfile, optionally building it where it does not exist
 func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
-	r := Resource{client, opts.Name, nil, opts.EndpointEnvVars}
+	r := Resource{client, opts.Name, opts.Network, nil}
 	imageID := getImageID(r.name)
 
 	// validating that the resource image exists, if not then building it
@@ -33,7 +33,11 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	if err != nil {
 		return Resource{}, err
 	}
-	container, err := client.CreateContainer(simpledocker.CreateContainerOptions{Name: containerID, Image: imageID})
+	container, err := client.CreateContainer(simpledocker.CreateContainerOptions{
+		Name:    containerID,
+		Image:   imageID,
+		Network: opts.Network,
+	})
 	if err != nil {
 		return Resource{}, err
 	}
@@ -51,15 +55,15 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 type Opts struct {
 	Name                 string
 	DockerfileContextDir string
-	EndpointEnvVars      map[string]string
+	Network              *docker.Network
 }
 
 // Resource - a container for each Endpoint to use (database, etc)
 type Resource struct {
-	client          simpledocker.Client
-	name            string
-	container       *docker.Container
-	endpointEnvVars map[string]string
+	client    simpledocker.Client
+	name      string
+	network   *docker.Network
+	container *docker.Container
 }
 
 // Clean - stops and removes the Resource's container
@@ -77,17 +81,4 @@ func (r Resource) Clean() error {
 	}
 
 	return nil
-}
-
-// GetLinkLine - returns the expected docker link line
-func (r Resource) GetLinkLine() string { return fmt.Sprintf("%s:%s", r.name, r.name) }
-
-// GetEnvVars - returns the env vars map as an array of strings
-func (r Resource) GetEnvVars() []string {
-	envVars := []string{}
-	for k, v := range r.endpointEnvVars {
-		envVars = append(envVars, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	return envVars
 }
