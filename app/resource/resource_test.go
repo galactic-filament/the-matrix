@@ -72,12 +72,7 @@ func TestGetContainerIP(t *testing.T) {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
 	}
-	defer func(t *testing.T, client simpledocker.Client, network *docker.Network) {
-		if err := client.RemoveNetwork(network); err != nil {
-			t.Errorf("Could not remove network: %s", err.Error())
-			return
-		}
-	}(t, client, network)
+	defer simpledocker.CleanupNetwork(t, client, network)
 
 	resource, err := getTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, network)
 	if err != nil {
