@@ -44,6 +44,13 @@ func (c Client) Connect(network *docker.Network, container *docker.Container) (*
 
 // GetContainerIP - fetchs a container ip address from that network
 func (c Client) GetContainerIP(network *docker.Network, container *docker.Container) (net.IP, error) {
+	if network == nil {
+		return nil, errors.New("Network was nil")
+	}
+	if container == nil {
+		return nil, errors.New("Container was nil")
+	}
+
 	currentNetwork, err := c.GetNetwork(network.ID)
 	if err != nil {
 		return nil, err
