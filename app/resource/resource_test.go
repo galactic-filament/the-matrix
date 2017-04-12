@@ -28,6 +28,7 @@ func getTestResource(client simpledocker.Client, relativePath string, name strin
 	resource, err := NewResource(client, Opts{
 		Name:                 name,
 		DockerfileContextDir: resourceDir,
+		Network:              network,
 	})
 	if err != nil {
 		return Resource{}, err
