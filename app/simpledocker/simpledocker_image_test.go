@@ -15,13 +15,6 @@ const defaultTestImage = "hello-world"
 const defaultTestImageTag = "latest"
 const defaultDbImage = "postgres"
 
-func cleanupImage(t *testing.T, client Client, imageID string) {
-	if err := client.RemoveImage(imageID); err != nil {
-		t.Errorf("Could not remove image: %s", err.Error())
-		return
-	}
-}
-
 func TestHasImage(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -59,7 +52,7 @@ func TestPullImage(t *testing.T) {
 	if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 		t.Errorf("Could not pull test image %s: %s", defaultTestImage, err.Error())
 	}
-	cleanupImage(t, client, defaultTestImage)
+	CleanupImage(t, client, defaultTestImage)
 }
 
 func TestRemoveImage(t *testing.T) {
@@ -123,5 +116,5 @@ func TestBuildImage(t *testing.T) {
 		t.Errorf("Could not build example image: %s", err.Error())
 		return
 	}
-	cleanupImage(t, client, exampleImageName)
+	CleanupImage(t, client, exampleImageName)
 }
