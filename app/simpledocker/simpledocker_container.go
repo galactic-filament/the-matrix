@@ -116,7 +116,7 @@ func (c CreateContainerOptions) toDockerOpts() docker.CreateContainerOptions {
 	if c.Network != nil {
 		networkingConfig = &docker.NetworkingConfig{
 			EndpointsConfig: map[string]*docker.EndpointConfig{
-				c.Network.Name: &docker.EndpointConfig{NetworkID: c.Network.ID},
+				c.Network.ID: &docker.EndpointConfig{NetworkID: c.Network.ID},
 			},
 		}
 	}
