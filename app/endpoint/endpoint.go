@@ -34,7 +34,7 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 	// creating an endpoint container
 	container, err := endpointRepo.Client.CreateContainer(simpledocker.CreateContainerOptions{
 		Name:    getContainerName(endpoint.Name),
-		Image:   repo.GetImageID(endpoint.Name),
+		Image:   repo.GetImageName(endpoint.Name),
 		Network: network,
 		EnvVars: endpointEnvVars,
 	})

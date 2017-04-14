@@ -30,17 +30,17 @@ func TestNonexistentNewRepo(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	imageID := GetImageID(defaultRepoName)
-	hasImage, err := client.HasImage(imageID)
+	imageName := GetImageName(defaultRepoName)
+	hasImage, err := client.HasImage(imageName)
 	if err != nil {
-		t.Errorf("Could not validate whether default repo image exists %s: %s", imageID, err.Error())
+		t.Errorf("Could not validate whether default repo image exists %s: %s", imageName, err.Error())
 		return
 	}
 
 	if hasImage {
-		t.Logf("Removing image %s to be pulled by newRepo()", imageID)
-		if err := client.RemoveImage(imageID); err != nil {
-			t.Errorf("Could not remove default repo image %s :%s", imageID, err.Error())
+		t.Logf("Removing image %s to be pulled by newRepo()", imageName)
+		if err := client.RemoveImage(imageName); err != nil {
+			t.Errorf("Could not remove default repo image %s :%s", imageName, err.Error())
 			return
 		}
 	}
@@ -60,18 +60,18 @@ func TestExistentNewRepo(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	imageID := GetImageID(defaultRepoName)
-	hasImage, err := client.HasImage(imageID)
+	imageName := GetImageName(defaultRepoName)
+	hasImage, err := client.HasImage(imageName)
 	if err != nil {
-		t.Errorf("Could not validate whether default repo image exists %s: %s", imageID, err.Error())
+		t.Errorf("Could not validate whether default repo image exists %s: %s", imageName, err.Error())
 		return
 	}
 
 	if !hasImage {
-		t.Logf("Repo image %s was not found, pulling manually", imageID)
-		err = client.PullImage(imageID, defaultRepoImageTag)
+		t.Logf("Repo image %s was not found, pulling manually", imageName)
+		err = client.PullImage(imageName, defaultRepoImageTag)
 		if err != nil {
-			t.Errorf("Could not pull default repo image %s: %s", imageID, err.Error())
+			t.Errorf("Could not pull default repo image %s: %s", imageName, err.Error())
 			return
 		}
 	}

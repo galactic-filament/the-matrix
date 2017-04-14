@@ -8,15 +8,15 @@ import (
 
 const defaultRepoImageTag = "latest"
 
-// GetImageID - returns formatted image ID of a repo
-func GetImageID(name string) string { return fmt.Sprintf("ihsw/%s", name) }
+// GetImageName - returns formatted image ID of a repo
+func GetImageName(name string) string { return fmt.Sprintf("ihsw/%s", name) }
 
 // NewRepo - creates a new repo based on a local or remote docker image
 func NewRepo(name string, client simpledocker.Client) (Repo, error) {
 	r := Repo{name, client}
-	imageID := GetImageID(r.Name)
+	imageName := GetImageName(r.Name)
 
-	hasImage, err := client.HasImage(imageID)
+	hasImage, err := client.HasImage(imageName)
 	if err != nil {
 		return Repo{}, err
 	}
@@ -25,7 +25,7 @@ func NewRepo(name string, client simpledocker.Client) (Repo, error) {
 		return r, nil
 	}
 
-	err = client.PullImage(imageID, defaultRepoImageTag)
+	err = client.PullImage(imageName, defaultRepoImageTag)
 	if err != nil {
 		return Repo{}, err
 	}
