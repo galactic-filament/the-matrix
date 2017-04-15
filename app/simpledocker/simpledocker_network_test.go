@@ -64,7 +64,6 @@ func TestConnect(t *testing.T) {
 		return
 	}
 
-	// time.Sleep(5 * time.Second)
 	isRunning, err := client.IsRunning(container)
 	if err != nil {
 		t.Errorf("Could not check if container was still running: %s", err.Error())
@@ -124,7 +123,6 @@ func TestCreateContainerWithNetwork(t *testing.T) {
 		return
 	}
 
-	// time.Sleep(5 * time.Second)
 	isRunning, err := client.IsRunning(container)
 	if err != nil {
 		t.Errorf("Could not check if container was still running: %s", err.Error())
@@ -184,7 +182,6 @@ func TestGetContainerIP(t *testing.T) {
 		return
 	}
 
-	// time.Sleep(5 * time.Second)
 	isRunning, err := client.IsRunning(container)
 	if err != nil {
 		t.Errorf("Could not check if container was still running: %s", err.Error())

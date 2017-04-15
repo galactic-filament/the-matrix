@@ -47,9 +47,6 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 		return Endpoint{}, err
 	}
 
-	// waiting for the endpoint to start up
-	// time.Sleep(5 * time.Second)
-
 	return endpoint, nil
 }
 

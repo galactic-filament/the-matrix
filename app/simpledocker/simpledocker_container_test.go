@@ -207,9 +207,6 @@ func TestIsStillRunning(t *testing.T) {
 		return
 	}
 
-	// waiting 5s to see if it is still up
-	// time.Sleep(5 * time.Second)
-
 	// validating that it is still up
 	isRunning, err := client.IsRunning(container)
 	if err != nil {

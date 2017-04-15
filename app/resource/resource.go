@@ -54,9 +54,6 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 		return Resource{}, err
 	}
 
-	// waiting for the resource to start up
-	// time.Sleep(5 * time.Second)
-
 	return r, nil
 }
 
