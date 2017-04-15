@@ -3,8 +3,6 @@ package repo
 import (
 	"fmt"
 
-	"time"
-
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
@@ -27,13 +25,10 @@ func NewRepo(name string, client simpledocker.Client) (Repo, error) {
 		return r, nil
 	}
 
-	fmt.Printf("Pulling image %s\n", imageName)
 	err = client.PullImage(imageName, defaultRepoImageTag)
 	if err != nil {
 		return Repo{}, err
 	}
-
-	time.Sleep(5 * time.Second)
 
 	return r, nil
 }
