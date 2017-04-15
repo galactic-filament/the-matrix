@@ -145,14 +145,16 @@ func TestIsNotRunning(t *testing.T) {
 		return
 	}
 	defer CleanupContainer(t, client, container)
-
 	if err := client.StartContainer(container, []string{}); err != nil {
 		t.Errorf("Could not start container %s: %s", container.Name, err.Error())
 		return
 	}
 
-	// waiting 5s for it to exit
-	// time.Sleep(5 * time.Second)
+	// waiting for it to exit
+	if _, err := client.dockerClient.WaitContainer(container.ID); err != nil {
+		t.Errorf("Could not wait for container to exit: %s", err.Error())
+		return
+	}
 
 	// validating that it exited
 	isRunning, err := client.IsRunning(container)
