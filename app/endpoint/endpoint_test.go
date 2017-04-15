@@ -43,17 +43,12 @@ func TestNewEndpoint(t *testing.T) {
 	 * resource and endpoint network
 	 */
 	// creating the network
-	network, err := client.CreateNetwork(defaultTestNetworkName, defaultTestNetworkDriver)
+	network, err := simpledocker.CreateTestNetwork(client, defaultTestNetworkName, defaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
 	}
-	defer func(t *testing.T, client simpledocker.Client, network *docker.Network) {
-		if err := client.RemoveNetwork(network); err != nil {
-			t.Errorf("Could not remove network: %s", err.Error())
-			return
-		}
-	}(t, client, network)
+	defer simpledocker.CleanupNetwork(t, client, network)
 
 	/**
 	 * endpoint resources

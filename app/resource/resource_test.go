@@ -68,7 +68,7 @@ func TestGetContainerIP(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	network, err := client.CreateNetwork(defaultTestNetworkName, defaultTestNetworkDriver)
+	network, err := simpledocker.CreateTestNetwork(client, defaultTestNetworkName, defaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return

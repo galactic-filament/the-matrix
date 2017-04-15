@@ -6,25 +6,10 @@ import (
 	"time"
 
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/util"
 )
 
 const DefaultTestNetworkName = "test-network"
 const DefaultNetworkDriver = "bridge"
-
-func CreateTestNetwork(client Client, namePrefix string, driver string) (*docker.Network, error) {
-	name, err := util.GetPrefixedUUID(namePrefix)
-	if err != nil {
-		return nil, err
-	}
-
-	network, err := client.CreateNetwork(name, driver)
-	if err != nil {
-		return nil, err
-	}
-
-	return network, nil
-}
 
 func TestCreateNetwork(t *testing.T) {
 	// creating a simpledocker client

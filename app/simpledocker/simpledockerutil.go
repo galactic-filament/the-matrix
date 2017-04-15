@@ -4,7 +4,23 @@ import (
 	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
+	"github.com/ihsw/the-matrix/app/util"
 )
+
+// CreateTestNetwork - used for creating test networks suffixed by a uuid
+func CreateTestNetwork(client Client, namePrefix string, driver string) (*docker.Network, error) {
+	name, err := util.GetPrefixedUUID(namePrefix)
+	if err != nil {
+		return nil, err
+	}
+
+	network, err := client.CreateNetwork(name, driver)
+	if err != nil {
+		return nil, err
+	}
+
+	return network, nil
+}
 
 // CleanupContainer - used for deferred cleanup of containers
 func CleanupContainer(t *testing.T, client Client, container *docker.Container) {
