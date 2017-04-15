@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/util"
@@ -153,7 +152,7 @@ func TestIsRunning(t *testing.T) {
 	}
 
 	// waiting 5s for it to exit
-	time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 
 	// validating that it exited
 	isRunning, err := client.IsRunning(container)
@@ -207,7 +206,7 @@ func TestIsStillRunning(t *testing.T) {
 	}
 
 	// waiting 5s to see if it is still up
-	time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 
 	// validating that it is still up
 	isRunning, err := client.IsRunning(container)

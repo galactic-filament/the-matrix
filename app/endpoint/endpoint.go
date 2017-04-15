@@ -3,7 +3,6 @@ package endpoint
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
@@ -49,7 +48,7 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 	}
 
 	// waiting for the endpoint to start up
-	time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 
 	return endpoint, nil
 }
