@@ -8,8 +8,9 @@ import "net"
 // CreateNetwork - creates a docker network
 func (c Client) CreateNetwork(name string, driver string) (*docker.Network, error) {
 	network, err := c.dockerClient.CreateNetwork(docker.CreateNetworkOptions{
-		Name:   name,
-		Driver: driver,
+		Name:           name,
+		Driver:         driver,
+		CheckDuplicate: true,
 	})
 	if err != nil {
 		return nil, err
