@@ -111,7 +111,7 @@ func TestRunContainer(t *testing.T) {
 	}
 }
 
-func TestIsRunning(t *testing.T) {
+func TestIsNotRunning(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Errorf("Could not create a new docker client: %s", err.Error())
