@@ -12,15 +12,6 @@ import (
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
-const defaultResourceName = "db"
-
-func cleanResources(t *testing.T, resources resource.Resources) {
-	if err := resources.Clean(); err != nil {
-		t.Errorf("Could not clean resources: %s", err.Error())
-		return
-	}
-}
-
 func TestNewEndpoint(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -49,7 +40,7 @@ func TestNewEndpoint(t *testing.T) {
 		t.Errorf("Could not get working dir: %s", err.Error())
 		return
 	}
-	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, defaultResourceName))
+	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, resource.DefaultTestResourceName))
 	if err != nil {
 		t.Errorf("Could not get absolute filepath for default resource name: %s", err.Error())
 		return
@@ -57,16 +48,16 @@ func TestNewEndpoint(t *testing.T) {
 
 	// creating the test resource
 	endpointResources, err := resource.NewResources(client, []resource.Opts{resource.Opts{
-		Name:                 defaultResourceName,
+		Name:                 resource.DefaultTestResourceName,
 		DockerfileContextDir: resourceDir,
 		Network:              network,
 		EndpointLabel:        "DATABASE",
 	}})
 	if err != nil {
-		t.Errorf("Could not create a new resource with default resource %s: %s", defaultResourceName, err.Error())
+		t.Errorf("Could not create a new resource with default resource %s: %s", resource.DefaultTestResourceName, err.Error())
 		return
 	}
-	defer cleanResources(t, endpointResources)
+	defer resource.CleanResources(t, endpointResources)
 
 	/**
 	 * endpoint
