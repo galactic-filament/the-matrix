@@ -12,8 +12,6 @@ import (
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
-const defaultTestNetworkName = "galaxy"
-const defaultTestNetworkDriver = "bridge"
 const defaultResourceName = "db"
 const defaultRepoName = "es-bueno"
 
@@ -43,7 +41,7 @@ func TestNewEndpoint(t *testing.T) {
 	 * resource and endpoint network
 	 */
 	// creating the network
-	network, err := simpledocker.CreateTestNetwork(client, defaultTestNetworkName, defaultTestNetworkDriver)
+	network, err := simpledocker.CreateTestNetwork(client, simpledocker.DefaultTestNetworkName, simpledocker.DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return

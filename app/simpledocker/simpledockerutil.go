@@ -7,6 +7,12 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
+// DefaultTestNetworkName - common network prefix
+const DefaultTestNetworkName = "galaxy"
+
+// DefaultTestNetworkDriver - common network driver
+const DefaultTestNetworkDriver = "bridge"
+
 // CreateTestNetwork - used for creating test networks suffixed by a uuid
 func CreateTestNetwork(client Client, namePrefix string, driver string) (*docker.Network, error) {
 	name, err := util.GetPrefixedUUID(namePrefix)
