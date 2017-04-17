@@ -37,13 +37,6 @@ func createTestResource(client simpledocker.Client, relativePath string, name st
 	return resource, nil
 }
 
-func cleanResource(t *testing.T, resource Resource) {
-	if err := resource.Clean(); err != nil {
-		t.Errorf("Could not clean resource %s: %s", resource.name, err.Error())
-		return
-	}
-}
-
 func TestNewResource(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -57,7 +50,7 @@ func TestNewResource(t *testing.T) {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
 	}
-	defer cleanResource(t, resource)
+	defer CleanResource(t, resource)
 }
 
 func TestGetContainerIP(t *testing.T) {
@@ -80,7 +73,7 @@ func TestGetContainerIP(t *testing.T) {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
 	}
-	defer cleanResource(t, resource)
+	defer CleanResource(t, resource)
 
 	ip, err := resource.GetContainerIP()
 	if err != nil {
