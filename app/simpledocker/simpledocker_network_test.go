@@ -6,9 +6,6 @@ import (
 	docker "github.com/fsouza/go-dockerclient"
 )
 
-const DefaultTestNetworkName = "test-network"
-const DefaultNetworkDriver = "bridge"
-
 func TestCreateNetwork(t *testing.T) {
 	// creating a simpledocker client
 	dockerClient, err := docker.NewClientFromEnv()
@@ -18,7 +15,7 @@ func TestCreateNetwork(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultNetworkDriver)
+	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
@@ -34,7 +31,7 @@ func TestConnect(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultNetworkDriver)
+	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
@@ -93,7 +90,7 @@ func TestCreateContainerWithNetwork(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultNetworkDriver)
+	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
@@ -152,7 +149,7 @@ func TestGetContainerIP(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
-	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultNetworkDriver)
+	network, err := CreateTestNetwork(client, DefaultTestNetworkName, DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
