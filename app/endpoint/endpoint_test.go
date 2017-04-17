@@ -72,15 +72,15 @@ func TestNewEndpoint(t *testing.T) {
 	 * endpoint
 	 */
 	// creating the resource repo
-	repo, err := repo.NewRepo(repo.DefaultTestRepoName, client)
+	endpointRepo, err := repo.NewRepo(repo.DefaultTestRepoName, client)
 	if err != nil {
 		t.Errorf("Could not create new repo %s: %s", repo.DefaultTestRepoName, err.Error())
 	}
 
 	// creating the endpoint
-	endpoint, err := NewEndpoint(repo, network, endpointResources)
+	endpoint, err := NewEndpoint(endpointRepo, network, endpointResources)
 	if err != nil {
-		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
+		t.Errorf("Could not create a new endpoint based on repo %s: %s", endpointRepo.Name, err.Error())
 		return
 	}
 	defer CleanEndpoint(t, endpoint)

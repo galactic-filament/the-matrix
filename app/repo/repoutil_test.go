@@ -15,8 +15,8 @@ func TestNewRepos(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	repoNames := []string{defaultRepoName}
+	repoNames := []string{DefaultTestRepoName}
 	if _, err := NewRepos(repoNames, client); err != nil {
-		t.Errorf("Could not create new repos from repo %s: %s", defaultRepoName, err.Error())
+		t.Errorf("Could not create new repos from repo %s: %s", DefaultTestRepoName, err.Error())
 	}
 }
