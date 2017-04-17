@@ -1,6 +1,8 @@
 package endpoint
 
 import (
+	"testing"
+
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
@@ -51,4 +53,12 @@ func NewEndpoints(repos []repo.Repo, network *docker.Network, resources resource
 	}
 
 	return endpoints, nil
+}
+
+// CleanEndpoint - common test func used for cleaning up an endpoint
+func CleanEndpoint(t *testing.T, e Endpoint) {
+	if err := e.Clean(); err != nil {
+		t.Errorf("Could not clean endpoint: %s", err.Error())
+		return
+	}
 }

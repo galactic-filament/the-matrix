@@ -22,13 +22,6 @@ func cleanResources(t *testing.T, resources resource.Resources) {
 	}
 }
 
-func cleanEndpoint(t *testing.T, e Endpoint) {
-	if err := e.Clean(); err != nil {
-		t.Errorf("Could not clean endpoint: %s", err.Error())
-		return
-	}
-}
-
 func TestNewEndpoint(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -91,7 +84,7 @@ func TestNewEndpoint(t *testing.T) {
 		t.Errorf("Could not create a new endpoint based on repo %s: %s", repo.Name, err.Error())
 		return
 	}
-	defer cleanEndpoint(t, endpoint)
+	defer CleanEndpoint(t, endpoint)
 
 	// verifying that it is running
 	isRunning, err := client.IsRunning(endpoint.Container)
