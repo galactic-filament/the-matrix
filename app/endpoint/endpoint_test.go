@@ -13,7 +13,6 @@ import (
 )
 
 const defaultResourceName = "db"
-const defaultRepoName = "es-bueno"
 
 func cleanResources(t *testing.T, resources resource.Resources) {
 	if err := resources.Clean(); err != nil {
@@ -73,9 +72,9 @@ func TestNewEndpoint(t *testing.T) {
 	 * endpoint
 	 */
 	// creating the resource repo
-	repo, err := repo.NewRepo(defaultRepoName, client)
+	repo, err := repo.NewRepo(repo.DefaultTestRepoName, client)
 	if err != nil {
-		t.Errorf("Could not create new repo %s: %s", defaultRepoName, err.Error())
+		t.Errorf("Could not create new repo %s: %s", repo.DefaultTestRepoName, err.Error())
 	}
 
 	// creating the endpoint

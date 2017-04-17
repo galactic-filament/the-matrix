@@ -7,8 +7,6 @@ import (
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
-const defaultRepoName = "es-bueno"
-
 func TestNewRepo(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -17,8 +15,8 @@ func TestNewRepo(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	if _, err := NewRepo(defaultRepoName, client); err != nil {
-		t.Errorf("Could not create new repo %s: %s", defaultRepoName, err.Error())
+	if _, err := NewRepo(DefaultTestRepoName, client); err != nil {
+		t.Errorf("Could not create new repo %s: %s", DefaultTestRepoName, err.Error())
 	}
 }
 
@@ -30,7 +28,7 @@ func TestNonexistentNewRepo(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	imageName := GetImageName(defaultRepoName)
+	imageName := GetImageName(DefaultTestRepoName)
 	hasImage, err := client.HasImage(imageName)
 	if err != nil {
 		t.Errorf("Could not validate whether default repo image exists %s: %s", imageName, err.Error())
@@ -45,9 +43,9 @@ func TestNonexistentNewRepo(t *testing.T) {
 		}
 	}
 
-	t.Logf("Creating new repo %s", defaultRepoName)
-	if _, err := NewRepo(defaultRepoName, client); err != nil {
-		t.Errorf("Could not create new repo %s :%s", defaultRepoName, err.Error())
+	t.Logf("Creating new repo %s", DefaultTestRepoName)
+	if _, err := NewRepo(DefaultTestRepoName, client); err != nil {
+		t.Errorf("Could not create new repo %s :%s", DefaultTestRepoName, err.Error())
 		return
 	}
 }
@@ -60,7 +58,7 @@ func TestExistentNewRepo(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	imageName := GetImageName(defaultRepoName)
+	imageName := GetImageName(DefaultTestRepoName)
 	hasImage, err := client.HasImage(imageName)
 	if err != nil {
 		t.Errorf("Could not validate whether default repo image exists %s: %s", imageName, err.Error())
@@ -76,8 +74,8 @@ func TestExistentNewRepo(t *testing.T) {
 		}
 	}
 
-	if _, err := NewRepo(defaultRepoName, client); err != nil {
-		t.Errorf("Could not create new repo %s :%s", defaultRepoName, err.Error())
+	if _, err := NewRepo(DefaultTestRepoName, client); err != nil {
+		t.Errorf("Could not create new repo %s :%s", DefaultTestRepoName, err.Error())
 		return
 	}
 }

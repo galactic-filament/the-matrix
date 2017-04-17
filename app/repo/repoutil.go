@@ -5,6 +5,9 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
+// DefaultTestRepoName - common repo name across all repo-related tests
+const DefaultTestRepoName = "es-bueno"
+
 type repoTask struct {
 	repo Repo
 	err  error
