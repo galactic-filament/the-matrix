@@ -15,7 +15,7 @@ const defaultResourceName = "db"
 const defaultTestNetworkName = "galaxy"
 const defaultTestNetworkDriver = "bridge"
 
-func getTestResource(client simpledocker.Client, relativePath string, name string, network *docker.Network) (Resource, error) {
+func createTestResource(client simpledocker.Client, relativePath string, name string, network *docker.Network) (Resource, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return Resource{}, err
@@ -52,7 +52,7 @@ func TestNewResource(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	resource, err := getTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, nil)
+	resource, err := createTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, nil)
 	if err != nil {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
@@ -75,7 +75,7 @@ func TestGetContainerIP(t *testing.T) {
 	}
 	defer simpledocker.CleanupNetwork(t, client, network)
 
-	resource, err := getTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, network)
+	resource, err := createTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, network)
 	if err != nil {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
