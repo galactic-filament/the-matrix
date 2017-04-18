@@ -63,9 +63,15 @@ func TestRun(t *testing.T) {
 	c := NewClient(clientRepo, clientNetwork)
 
 	// running it against the endpoint
-	if err := c.Run(clientEndpoint); err != nil {
+	containerOutput, err := c.Run(clientEndpoint)
+	if err != nil {
 		t.Errorf("Could not run endpoint against client: %s", err.Error())
 		return
 	}
 	defer CleanClient(t, c)
+
+	if len(containerOutput) > 0 {
+		t.Errorf("Client container failed: %s", containerOutput)
+		return
+	}
 }

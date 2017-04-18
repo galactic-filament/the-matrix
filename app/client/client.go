@@ -36,11 +36,21 @@ type Client struct {
 }
 
 // Run - runs this client against an endpoint
-func (c Client) Run(clientEndpoint endpoint.Endpoint) error {
+func (c Client) Run(clientEndpoint endpoint.Endpoint) (string, error) {
 	// gathering the endpoint's ip address
 	endpointHostIP, err := c.Client.GetContainerIP(c.Network, clientEndpoint.Container)
 	if err != nil {
-		return err
+		return "", err
+	}
+
+	// validating that there is no client with this name
+	containerName := getContainerName(clientEndpoint, c.Name)
+	container, err := c.Client.GetContainer(containerName)
+	if err != nil {
+		return "", err
+	}
+	if container != nil {
+		return "", errors.New("Client container already exists")
 	}
 
 	// creating the client container
@@ -48,27 +58,32 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) error {
 		"APP_HOST": endpointHostIP.String(),
 		"APP_PORT": strconv.Itoa(DefaultAppPort),
 	}
-	container, err := c.Client.CreateContainer(simpledocker.CreateContainerOptions{
-		Name:    getContainerName(clientEndpoint, c.Name),
+	container, err = c.Client.CreateContainer(simpledocker.CreateContainerOptions{
+		Name:    containerName,
 		Image:   repo.GetImageName(c.Name),
 		Network: c.Network,
 		EnvVars: clientEnvVars,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 	c.Container = container
 
 	// running it out
 	failed, err := c.Client.RunContainer(container, []string{})
 	if err != nil {
-		return err
+		return "", err
 	}
 	if failed {
-		return errors.New("Client container failed")
+		containerOutput, err := c.Client.GetContainerLogs(c.Container)
+		if err != nil {
+			return "", err
+		}
+
+		return containerOutput, nil
 	}
 
-	return nil
+	return "", nil
 }
 
 // Clean - cleans a client's container
