@@ -54,6 +54,9 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) error {
 		Network: c.Network,
 		EnvVars: clientEnvVars,
 	})
+	if err != nil {
+		return err
+	}
 	c.Container = container
 
 	// running it out

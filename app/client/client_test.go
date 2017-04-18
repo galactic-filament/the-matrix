@@ -54,29 +54,18 @@ func TestRun(t *testing.T) {
 	}
 	defer endpoint.CleanEndpoint(t, clientEndpoint)
 
-	// verifying that it is running
-	isRunning, err := client.IsRunning(clientEndpoint.Container)
-	if err != nil {
-		t.Errorf("Could not check if endpoint container is running: %s", err.Error())
-		return
-	}
-	if !isRunning {
-		containerOutput, err := client.GetContainerLogs(clientEndpoint.Container)
-		if err != nil {
-			t.Errorf("Could not fetch container logs: %s", err.Error())
-			return
-		}
-
-		t.Errorf("Endpoint container %s was not up: %s", clientEndpoint.Name, containerOutput)
-		return
-	}
-
-	// creating a client and running it against the endpoint
+	// creating a client
 	clientRepo, err := repo.NewRepo(DefaultTestClientName, client)
+	if err != nil {
+		t.Errorf("Could not create repo: %s", err.Error())
+		return
+	}
 	c := NewClient(clientRepo, clientNetwork)
+	defer CleanClient(t, c)
+
+	// running it against the endpoint
 	if err := c.Run(clientEndpoint); err != nil {
 		t.Errorf("Could not run endpoint against client: %s", err.Error())
 		return
 	}
-	defer CleanClient(t, c)
 }
