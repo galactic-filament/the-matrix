@@ -42,9 +42,6 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) error {
 	if err != nil {
 		return err
 	}
-	if endpointHostIP == nil {
-		return errors.New("Endpoint IP was nil")
-	}
 
 	// creating the client container
 	clientEnvVars := map[string]string{
