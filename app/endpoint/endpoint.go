@@ -47,6 +47,15 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 		return Endpoint{}, err
 	}
 
+	// verifying that it is running
+	isRunning, err := e.Client.IsRunning(e.Container)
+	if err != nil {
+		return Endpoint{}, err
+	}
+	if !isRunning {
+		return Endpoint{}, errors.New("Endpoint was not up")
+	}
+
 	return e, nil
 }
 

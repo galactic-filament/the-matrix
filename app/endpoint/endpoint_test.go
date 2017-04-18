@@ -52,21 +52,4 @@ func TestNewEndpoint(t *testing.T) {
 		return
 	}
 	defer CleanEndpoint(t, e)
-
-	// verifying that it is running
-	isRunning, err := client.IsRunning(e.Container)
-	if err != nil {
-		t.Errorf("Could not check if endpoint container is running: %s", err.Error())
-		return
-	}
-	if !isRunning {
-		containerOutput, err := client.GetContainerLogs(e.Container)
-		if err != nil {
-			t.Errorf("Could not fetch container logs: %s", err.Error())
-			return
-		}
-
-		t.Errorf("Endpoint container %s was not up: %s", e.Name, containerOutput)
-		return
-	}
 }
