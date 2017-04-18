@@ -14,7 +14,7 @@ func getContainerName(name string) string { return fmt.Sprintf("%s-endpoint", na
 
 // NewEndpoint - creates a new endpoint for a client to consume
 func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources resource.Resources) (Endpoint, error) {
-	endpoint := Endpoint{
+	e := Endpoint{
 		Repo:    endpointRepo,
 		Network: network,
 	}
@@ -32,22 +32,22 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 
 	// creating an endpoint container
 	container, err := endpointRepo.Client.CreateContainer(simpledocker.CreateContainerOptions{
-		Name:    getContainerName(endpoint.Name),
-		Image:   repo.GetImageName(endpoint.Name),
+		Name:    getContainerName(e.Name),
+		Image:   repo.GetImageName(e.Name),
 		Network: network,
 		EnvVars: endpointEnvVars,
 	})
 	if err != nil {
 		return Endpoint{}, err
 	}
-	endpoint.Container = container
+	e.Container = container
 
 	// starting it up
-	if err := endpoint.Client.StartContainer(container, []string{}); err != nil {
+	if err := e.Client.StartContainer(container, []string{}); err != nil {
 		return Endpoint{}, err
 	}
 
-	return endpoint, nil
+	return e, nil
 }
 
 // Endpoint - a container ran against an Endpoint
