@@ -16,7 +16,11 @@ func TestNewResource(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	resource, err := CreateTestResource(client, fmt.Sprintf("../../%s", DefaultTestResourceName), DefaultTestResourceName, nil)
+	resource, err := CreateTestResource(CreateTestResourceOpts{
+		Client:       client,
+		Name:         DefaultTestResourceName,
+		RelativePath: fmt.Sprintf("../../%s", DefaultTestResourceName),
+	})
 	if err != nil {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
@@ -39,7 +43,12 @@ func TestGetContainerIP(t *testing.T) {
 	}
 	defer simpledocker.CleanupNetwork(t, client, network)
 
-	resource, err := CreateTestResource(client, fmt.Sprintf("../../%s", DefaultTestResourceName), DefaultTestResourceName, network)
+	resource, err := CreateTestResource(CreateTestResourceOpts{
+		Client:       client,
+		Network:      network,
+		Name:         DefaultTestResourceName,
+		RelativePath: fmt.Sprintf("../../%s", DefaultTestResourceName),
+	})
 	if err != nil {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return

@@ -28,12 +28,12 @@ func TestNewEndpoint(t *testing.T) {
 	defer simpledocker.CleanupNetwork(t, client, endpointNetwork)
 
 	// creating the endpoint resource
-	endpointResource, err := resource.CreateTestResource(
-		client,
-		fmt.Sprintf("../../%s", resource.DefaultTestResourceName),
-		resource.DefaultTestResourceName,
-		endpointNetwork,
-	)
+	endpointResource, err := resource.CreateTestResource(resource.CreateTestResourceOpts{
+		Client:       client,
+		Network:      endpointNetwork,
+		Name:         resource.DefaultTestResourceName,
+		RelativePath: fmt.Sprintf("../../%s", resource.DefaultTestResourceName),
+	})
 	if err != nil {
 		t.Errorf("Could not create resource: %s", err.Error())
 		return

@@ -13,21 +13,31 @@ import (
 // DefaultTestResourceName - common resource name for testing
 const DefaultTestResourceName = "db"
 
+// CreateTestResourceOpts - opts for corresponding func
+type CreateTestResourceOpts struct {
+	Client        simpledocker.Client
+	Network       *docker.Network
+	RelativePath  string
+	Name          string
+	EndpointLabel string
+}
+
 // CreateTestResource - common test func for creating a resource
-func CreateTestResource(client simpledocker.Client, relativePath string, name string, network *docker.Network) (Resource, error) {
+func CreateTestResource(opts CreateTestResourceOpts) (Resource, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return Resource{}, err
 	}
-	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/%s", cwd, relativePath))
+	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/%s", cwd, opts.RelativePath))
 	if err != nil {
 		return Resource{}, err
 	}
 
-	resource, err := NewResource(client, Opts{
-		Name:                 name,
+	resource, err := NewResource(opts.Client, Opts{
+		Name:                 opts.Name,
 		DockerfileContextDir: resourceDir,
-		Network:              network,
+		Network:              opts.Network,
+		EndpointLabel:        opts.EndpointLabel,
 	})
 	if err != nil {
 		return Resource{}, err

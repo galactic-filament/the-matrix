@@ -26,20 +26,21 @@ func TestRun(t *testing.T) {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
 	}
-	defer simpledocker.CleanupNetwork(t, client, clientNetwork)
+	// defer simpledocker.CleanupNetwork(t, client, clientNetwork)
 
 	// creating the endpoint resource
-	endpointResource, err := resource.CreateTestResource(
-		client,
-		fmt.Sprintf("../../%s", resource.DefaultTestResourceName),
-		resource.DefaultTestResourceName,
-		clientNetwork,
-	)
+	endpointResource, err := resource.CreateTestResource(resource.CreateTestResourceOpts{
+		Client:        client,
+		Network:       clientNetwork,
+		RelativePath:  fmt.Sprintf("../../%s", resource.DefaultTestResourceName),
+		Name:          resource.DefaultTestResourceName,
+		EndpointLabel: "DATABASE",
+	})
 	if err != nil {
 		t.Errorf("Could not create resource: %s", err.Error())
 		return
 	}
-	defer resource.CleanResource(t, endpointResource)
+	// defer resource.CleanResource(t, endpointResource)
 
 	// creating the endpoint
 	clientEndpoint, err := endpoint.CreateTestEndpoint(endpoint.CreateTestEndpointOpts{
@@ -52,7 +53,7 @@ func TestRun(t *testing.T) {
 		t.Errorf("Could not create endpoint: %s", err.Error())
 		return
 	}
-	defer endpoint.CleanEndpoint(t, clientEndpoint)
+	// defer endpoint.CleanEndpoint(t, clientEndpoint)
 
 	// creating a client
 	clientRepo, err := repo.NewRepo(DefaultTestClientName, client)
@@ -68,7 +69,7 @@ func TestRun(t *testing.T) {
 		t.Errorf("Could not run endpoint against client: %s", err.Error())
 		return
 	}
-	defer CleanClient(t, c, clientContainer)
+	// defer CleanClient(t, c, clientContainer)
 
 	if err == ErrClientFailed {
 		containerOutput, err := c.Client.GetContainerLogs(clientContainer)
