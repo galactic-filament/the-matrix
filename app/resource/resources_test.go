@@ -23,23 +23,19 @@ func TestNewResources(t *testing.T) {
 		t.Errorf("Could not get working dir: %s", err.Error())
 		return
 	}
-	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, defaultResourceName))
+	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, DefaultTestResourceName))
 	if err != nil {
 		t.Errorf("Could not generate abs resource dir filepath: %s", err.Error())
 		return
 	}
 
 	resources, err := NewResources(client, []Opts{Opts{
-		Name:                 defaultResourceName,
+		Name:                 DefaultTestResourceName,
 		DockerfileContextDir: resourceDir,
 	}})
 	if err != nil {
-		t.Errorf("Could not create new resources with default resource %s: %s", defaultResourceName, err.Error())
+		t.Errorf("Could not create new resources with default resource %s: %s", DefaultTestResourceName, err.Error())
 		return
 	}
-
-	if err := resources.Clean(); err != nil {
-		t.Errorf("Could not clean resources: %s", err.Error())
-		return
-	}
+	defer CleanResources(t, resources)
 }

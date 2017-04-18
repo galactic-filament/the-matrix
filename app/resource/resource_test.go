@@ -1,41 +1,12 @@
 package resource
 
 import (
-	"path/filepath"
-	"testing"
-
 	"fmt"
-	"os"
+	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
-
-const defaultResourceName = "db"
-const defaultTestNetworkName = "galaxy"
-const defaultTestNetworkDriver = "bridge"
-
-func createTestResource(client simpledocker.Client, relativePath string, name string, network *docker.Network) (Resource, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return Resource{}, err
-	}
-	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/%s", cwd, relativePath))
-	if err != nil {
-		return Resource{}, err
-	}
-
-	resource, err := NewResource(client, Opts{
-		Name:                 name,
-		DockerfileContextDir: resourceDir,
-		Network:              network,
-	})
-	if err != nil {
-		return Resource{}, err
-	}
-
-	return resource, nil
-}
 
 func TestNewResource(t *testing.T) {
 	dockerClient, err := docker.NewClientFromEnv()
@@ -45,7 +16,7 @@ func TestNewResource(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	resource, err := createTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, nil)
+	resource, err := CreateTestResource(client, fmt.Sprintf("../../%s", DefaultTestResourceName), DefaultTestResourceName, nil)
 	if err != nil {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
@@ -61,14 +32,14 @@ func TestGetContainerIP(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	network, err := simpledocker.CreateTestNetwork(client, defaultTestNetworkName, defaultTestNetworkDriver)
+	network, err := simpledocker.CreateTestNetwork(client, simpledocker.DefaultTestNetworkName, simpledocker.DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
 	}
 	defer simpledocker.CleanupNetwork(t, client, network)
 
-	resource, err := createTestResource(client, fmt.Sprintf("../../%s", defaultResourceName), defaultResourceName, network)
+	resource, err := CreateTestResource(client, fmt.Sprintf("../../%s", DefaultTestResourceName), DefaultTestResourceName, network)
 	if err != nil {
 		t.Errorf("Could not create test resource: %s", err.Error())
 		return
