@@ -79,7 +79,7 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) (string, error) {
 	c.Container = container
 
 	// running it out
-	failed, err := c.Client.RunContainer(container, []string{})
+	failed, err := c.Client.RunContainer(c.Container, []string{})
 	if err != nil {
 		return "", err
 	}
