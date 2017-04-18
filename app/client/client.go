@@ -53,7 +53,8 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) (string, error) {
 		Network: c.Network,
 		EnvVars: clientEnvVars,
 	}
-	container, err := c.Client.CreateContainer(createContainerOpts)
+	var container *docker.Container
+	container, err = c.Client.CreateContainer(createContainerOpts)
 	if err != nil {
 		// failing on real error
 		if err != docker.ErrContainerAlreadyExists {
