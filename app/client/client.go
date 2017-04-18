@@ -46,8 +46,8 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) (*docker.Container, error)
 
 	// creating the client container
 	clientEnvVars := map[string]string{
-		"APP_HOST": endpointHostIP.String(),
-		"APP_PORT": strconv.Itoa(DefaultAppPort),
+		"API_HOST": endpointHostIP.String(),
+		"API_PORT": strconv.Itoa(DefaultAppPort),
 	}
 	containerName := getContainerName(clientEndpoint, c.Name)
 	createContainerOpts := simpledocker.CreateContainerOptions{
