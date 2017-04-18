@@ -67,3 +67,12 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) error {
 
 	return nil
 }
+
+// Clean - cleans a client's container
+func (c Client) Clean() error {
+	if err := c.Client.RemoveContainer(c.Container); err != nil {
+		return err
+	}
+
+	return nil
+}
