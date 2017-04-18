@@ -40,6 +40,10 @@ func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 
 // StartContainer - starts a container up
 func (c Client) StartContainer(container *docker.Container, links []string) error {
+	if container == nil {
+		return errors.New("Container was nil")
+	}
+
 	err := c.dockerClient.StartContainer(container.ID, &docker.HostConfig{Links: links})
 	if err != nil {
 		return err
