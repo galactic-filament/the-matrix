@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"time"
+
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/endpoint"
 	"github.com/ihsw/the-matrix/app/repo"
@@ -53,7 +55,10 @@ func TestRun(t *testing.T) {
 		t.Errorf("Could not create endpoint: %s", err.Error())
 		return
 	}
-	defer endpoint.CleanEndpoint(t, clientEndpoint)
+	defer func() {
+		endpoint.CleanEndpoint(t, clientEndpoint)
+		time.Sleep(5 * time.Second)
+	}()
 
 	// creating a client
 	clientRepo, err := repo.NewRepo(DefaultTestClientName, client)

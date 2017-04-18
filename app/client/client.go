@@ -3,6 +3,7 @@ package client
 import (
 	"errors"
 	"strconv"
+	"time"
 
 	"fmt"
 
@@ -71,6 +72,9 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) (*docker.Container, error)
 		if err := c.Client.RemoveContainer(container); err != nil {
 			return nil, err
 		}
+
+		// sleeping to ensure the container is removed and flushed out
+		time.Sleep(5 * time.Second)
 
 		// creating a new client container
 		container, err = c.Client.CreateContainer(createContainerOpts)
