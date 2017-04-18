@@ -6,6 +6,7 @@ import (
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
+	"github.com/ihsw/the-matrix/app/simpledocker"
 	"github.com/ihsw/the-matrix/app/util"
 )
 
@@ -53,6 +54,33 @@ func NewEndpoints(repos []repo.Repo, network *docker.Network, resources resource
 	}
 
 	return endpoints, nil
+}
+
+// CreateTestEndpointOpts - opts for corresponding func
+type CreateTestEndpointOpts struct {
+	Client   simpledocker.Client
+	RepoName string
+	Resource resource.Resource
+	Network  *docker.Network
+}
+
+// CreateTestEndpoint - common test func for creating a test endpoint
+func CreateTestEndpoint(opts CreateTestEndpointOpts) (Endpoint, error) {
+	endpointRepo, err := repo.NewRepo(opts.RepoName, opts.Client)
+	if err != nil {
+		return Endpoint{}, err
+	}
+
+	e, err := NewEndpoint(
+		endpointRepo,
+		opts.Network,
+		resource.Resources{Values: []resource.Resource{opts.Resource}},
+	)
+	if err != nil {
+		return Endpoint{}, err
+	}
+
+	return e, nil
 }
 
 // CleanEndpoint - common test func used for cleaning up an endpoint

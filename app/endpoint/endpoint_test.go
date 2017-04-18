@@ -2,8 +2,6 @@ package endpoint
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
@@ -13,6 +11,7 @@ import (
 )
 
 func TestNewEndpoint(t *testing.T) {
+	// creating the simpledocker client
 	dockerClient, err := docker.NewClientFromEnv()
 	if err != nil {
 		t.Errorf("Could not create a new docker client: %s", err.Error())
@@ -20,76 +19,54 @@ func TestNewEndpoint(t *testing.T) {
 	}
 	client := simpledocker.NewClient(dockerClient)
 
-	/**
-	 * resource and endpoint network
-	 */
-	// creating the network
-	network, err := simpledocker.CreateTestNetwork(client, simpledocker.DefaultTestNetworkName, simpledocker.DefaultTestNetworkDriver)
+	// creating the endpoint network
+	endpointNetwork, err := simpledocker.CreateTestNetwork(client, simpledocker.DefaultTestNetworkName, simpledocker.DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
 		return
 	}
-	defer simpledocker.CleanupNetwork(t, client, network)
+	defer simpledocker.CleanupNetwork(t, client, endpointNetwork)
 
-	/**
-	 * endpoint resources
-	 */
-	// creating the resource dir
-	cwd, err := os.Getwd()
+	// creating the endpoint resource
+	endpointResource, err := resource.CreateTestResource(
+		client,
+		fmt.Sprintf("../../%s", resource.DefaultTestResourceName),
+		resource.DefaultTestResourceName,
+		endpointNetwork,
+	)
 	if err != nil {
-		t.Errorf("Could not get working dir: %s", err.Error())
+		t.Errorf("Could not create resource: %s", err.Error())
 		return
 	}
-	resourceDir, err := filepath.Abs(fmt.Sprintf("%s/../../%s", cwd, resource.DefaultTestResourceName))
-	if err != nil {
-		t.Errorf("Could not get absolute filepath for default resource name: %s", err.Error())
-		return
-	}
-
-	// creating the test resource
-	endpointResources, err := resource.NewResources(client, []resource.Opts{resource.Opts{
-		Name:                 resource.DefaultTestResourceName,
-		DockerfileContextDir: resourceDir,
-		Network:              network,
-		EndpointLabel:        "DATABASE",
-	}})
-	if err != nil {
-		t.Errorf("Could not create a new resource with default resource %s: %s", resource.DefaultTestResourceName, err.Error())
-		return
-	}
-	defer resource.CleanResources(t, endpointResources)
-
-	/**
-	 * endpoint
-	 */
-	// creating the resource repo
-	endpointRepo, err := repo.NewRepo(repo.DefaultTestRepoName, client)
-	if err != nil {
-		t.Errorf("Could not create new repo %s: %s", repo.DefaultTestRepoName, err.Error())
-	}
+	defer resource.CleanResource(t, endpointResource)
 
 	// creating the endpoint
-	endpoint, err := NewEndpoint(endpointRepo, network, endpointResources)
+	e, err := CreateTestEndpoint(CreateTestEndpointOpts{
+		Client:   client,
+		RepoName: repo.DefaultTestRepoName,
+		Resource: endpointResource,
+		Network:  endpointNetwork,
+	})
 	if err != nil {
-		t.Errorf("Could not create a new endpoint based on repo %s: %s", endpointRepo.Name, err.Error())
+		t.Errorf("Could not create endpoint: %s", err.Error())
 		return
 	}
-	defer CleanEndpoint(t, endpoint)
+	defer CleanEndpoint(t, e)
 
 	// verifying that it is running
-	isRunning, err := client.IsRunning(endpoint.Container)
+	isRunning, err := client.IsRunning(e.Container)
 	if err != nil {
 		t.Errorf("Could not check if endpoint container is running: %s", err.Error())
 		return
 	}
 	if !isRunning {
-		containerOutput, err := client.GetContainerLogs(endpoint.Container)
+		containerOutput, err := client.GetContainerLogs(e.Container)
 		if err != nil {
 			t.Errorf("Could not fetch container logs: %s", err.Error())
 			return
 		}
 
-		t.Errorf("Endpoint container %s was not up: %s", endpoint.Name, containerOutput)
+		t.Errorf("Endpoint container %s was not up: %s", e.Name, containerOutput)
 		return
 	}
 }
