@@ -69,4 +69,14 @@ func TestRun(t *testing.T) {
 		return
 	}
 	defer CleanClient(t, c, clientContainer)
+
+	if err == ErrClientFailed {
+		containerOutput, err := c.Client.GetContainerLogs(clientContainer)
+		if err != nil {
+			t.Errorf("Could not get container logs: %s", err.Error())
+			return
+		}
+
+		t.Errorf("Client failed: %s", containerOutput)
+	}
 }
