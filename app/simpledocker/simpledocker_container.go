@@ -2,6 +2,7 @@ package simpledocker
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
 	docker "github.com/fsouza/go-dockerclient"
@@ -72,6 +73,10 @@ func (c Client) StopContainer(container *docker.Container) error {
 
 // RemoveContainer - removes a container
 func (c Client) RemoveContainer(container *docker.Container) error {
+	if container == nil {
+		return errors.New("Container was nil")
+	}
+
 	err := c.dockerClient.RemoveContainer(docker.RemoveContainerOptions{
 		ID:            container.ID,
 		RemoveVolumes: true,
