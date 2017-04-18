@@ -3,6 +3,8 @@ package repo
 import (
 	"fmt"
 
+	"time"
+
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
 
@@ -29,6 +31,8 @@ func NewRepo(name string, client simpledocker.Client) (Repo, error) {
 	if err != nil {
 		return Repo{}, err
 	}
+
+	time.Sleep(5 * time.Second)
 
 	return r, nil
 }
