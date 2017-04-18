@@ -67,5 +67,9 @@ func (c Client) GetContainerIP(network *docker.Network, container *docker.Contai
 		return nil, err
 	}
 
+	if ip == nil {
+		return nil, errors.New("IP was nil")
+	}
+
 	return ip, nil
 }

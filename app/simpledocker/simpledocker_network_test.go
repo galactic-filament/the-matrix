@@ -189,13 +189,8 @@ func TestGetContainerIP(t *testing.T) {
 		return
 	}
 
-	ip, err := client.GetContainerIP(network, container)
-	if err != nil {
+	if _, err := client.GetContainerIP(network, container); err != nil {
 		t.Errorf("Could not get container IP: %s", err.Error())
-		return
-	}
-	if ip == nil {
-		t.Errorf("Container IP was nil")
 		return
 	}
 }
