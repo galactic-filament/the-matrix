@@ -41,7 +41,7 @@ func (c Client) GetContainerLogs(container *docker.Container) (string, error) {
 // StartContainer - starts a container up
 func (c Client) StartContainer(container *docker.Container, links []string) error {
 	if container == nil {
-		return errors.New("Container was nil")
+		return errors.New("Cannot start nil container")
 	}
 
 	err := c.dockerClient.StartContainer(container.ID, &docker.HostConfig{Links: links})
@@ -78,7 +78,7 @@ func (c Client) StopContainer(container *docker.Container) error {
 // RemoveContainer - removes a container
 func (c Client) RemoveContainer(container *docker.Container) error {
 	if container == nil {
-		return errors.New("Container was nil")
+		return errors.New("Cannot remove nil container")
 	}
 
 	err := c.dockerClient.RemoveContainer(docker.RemoveContainerOptions{
