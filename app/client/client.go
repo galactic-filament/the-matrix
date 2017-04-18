@@ -5,8 +5,6 @@ import (
 
 	"fmt"
 
-	"errors"
-
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/endpoint"
 	"github.com/ihsw/the-matrix/app/repo"
@@ -43,29 +41,39 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) (string, error) {
 		return "", err
 	}
 
-	// validating that there is no client with this name
-	containerName := getContainerName(clientEndpoint, c.Name)
-	container, err := c.Client.GetContainer(containerName)
-	if err != nil {
-		return "", err
-	}
-	if container != nil {
-		return "", errors.New("Client container already exists")
-	}
-
 	// creating the client container
 	clientEnvVars := map[string]string{
 		"APP_HOST": endpointHostIP.String(),
 		"APP_PORT": strconv.Itoa(DefaultAppPort),
 	}
-	container, err = c.Client.CreateContainer(simpledocker.CreateContainerOptions{
+	containerName := getContainerName(clientEndpoint, c.Name)
+	createContainerOpts := simpledocker.CreateContainerOptions{
 		Name:    containerName,
 		Image:   repo.GetImageName(c.Name),
 		Network: c.Network,
 		EnvVars: clientEnvVars,
-	})
+	}
+	container, err := c.Client.CreateContainer(createContainerOpts)
 	if err != nil {
-		return "", err
+		// failing on real error
+		if err != docker.ErrContainerAlreadyExists {
+			return "", err
+		}
+
+		// removing the existing client container
+		container, err := c.Client.GetContainer(containerName)
+		if err != nil {
+			return "", err
+		}
+		if err := c.Client.RemoveContainer(container); err != nil {
+			return "", err
+		}
+
+		// creating a new client container
+		container, err = c.Client.CreateContainer(createContainerOpts)
+		if err != nil {
+			return "", err
+		}
 	}
 	c.Container = container
 
