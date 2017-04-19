@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"time"
+
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
@@ -55,6 +57,9 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 	if !isRunning {
 		return Endpoint{}, errors.New("Endpoint was not up")
 	}
+
+	// sleeping to ensure this endpoint finishes booting up
+	time.Sleep(5 * time.Second)
 
 	return e, nil
 }
