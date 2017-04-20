@@ -55,6 +55,7 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 		return Endpoint{}, err
 	}
 	e.Container = container
+	fmt.Printf("Created container %s\n", container.Name)
 
 	// starting it up
 	if err := e.Client.StartContainer(container, []string{}); err != nil {

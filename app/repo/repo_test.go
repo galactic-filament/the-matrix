@@ -45,7 +45,10 @@ func TestNonexistentNewRepo(t *testing.T) {
 			t.Errorf("Could not get containers for this image: %s", err.Error())
 			return
 		}
-		fmt.Printf("%d containers exist on image %s, going to fail hard!", len(containers), imageName)
+		fmt.Printf("%d containers exist on image %s, going to fail hard!\n", len(containers), imageName)
+		for _, container := range containers {
+			fmt.Printf("Container %s found\n", container.Name)
+		}
 
 		if err := client.RemoveImage(imageName); err != nil {
 			t.Errorf("Could not remove default repo image %s :%s", imageName, err.Error())
