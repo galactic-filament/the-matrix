@@ -290,3 +290,93 @@ func TestGetContainerLogs(t *testing.T) {
 		return
 	}
 }
+
+func TestGetContainersByImageID(t *testing.T) { // creating a simpledocker client
+	dockerClient, err := docker.NewClientFromEnv()
+	if err != nil {
+		t.Errorf("Could not create a new docker client: %s", err.Error())
+		return
+	}
+	client := NewClient(dockerClient)
+
+	// ensuring the image exists
+	hasImage, err := client.HasImage(defaultTestImage)
+	if err != nil {
+		t.Errorf("Could not check if image exists: %s", err.Error())
+		return
+	}
+	if !hasImage {
+		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
+			t.Errorf("Could not pull image: %s", err.Error())
+			return
+		}
+	}
+
+	// spinning up some workers for creating the containers
+	type task struct {
+		container *docker.Container
+		err       error
+	}
+	in := make(chan struct{})
+	out := make(chan task)
+	worker := func() {
+		for _ = range in {
+			name, err := util.GetPrefixedUUID(defaultTestContainerName)
+			if err != nil {
+				out <- task{nil, err}
+				return
+			}
+
+			container, err := client.CreateContainer(CreateContainerOptions{Name: name, Image: defaultTestImage})
+			out <- task{container, err}
+		}
+	}
+	postWork := func() { close(out) }
+	util.Work(4, worker, postWork)
+
+	// queueing it up
+	go func() {
+		for i := 0; i < 10; i++ {
+			in <- struct{}{}
+		}
+		close(in)
+	}()
+
+	// waiting for it to drain out
+	taskResults := []task{}
+	for result := range out {
+		taskResults = append(taskResults, result)
+	}
+
+	// checking for errors
+	containers := map[string]*docker.Container{}
+	for _, result := range taskResults {
+		if result.err != nil {
+			t.Errorf("Could not create container: %s", err.Error())
+			return
+		}
+
+		defer CleanupContainer(t, client, result.container)
+		containers[result.container.ID] = result.container
+	}
+
+	// validating that the containers exist
+	foundContainers, err := client.GetContainersByImageID(defaultTestImage, defaultTestImageTag)
+	if err != nil {
+		t.Errorf("Could not fetch containers by image: %s", err.Error())
+		return
+	}
+	if len(foundContainers) != len(containers) {
+		t.Errorf(
+			"Number of found containers did not match created containers: %d found %d expected",
+			len(foundContainers),
+			len(containers),
+		)
+		return
+	}
+	for _, container := range foundContainers {
+		if _, ok := containers[container.ID]; !ok {
+			t.Errorf("Container %s was not in found containers", container.ID)
+		}
+	}
+}

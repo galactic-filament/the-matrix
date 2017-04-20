@@ -5,7 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"time"
+
 	docker "github.com/fsouza/go-dockerclient"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 // CreateContainer - creates a container but doesn't start it up
@@ -14,6 +17,8 @@ func (c Client) CreateContainer(opts CreateContainerOptions) (*docker.Container,
 	if err != nil {
 		return nil, err
 	}
+
+	time.Sleep(util.PostDockerActionDelayInSeconds * time.Second)
 
 	return container, nil
 }
@@ -135,4 +140,27 @@ func (c CreateContainerOptions) toDockerOpts() docker.CreateContainerOptions {
 		Config:           &docker.Config{Image: c.Image, Env: envVars},
 		NetworkingConfig: networkingConfig,
 	}
+}
+
+// GetContainersByImageID - fetches all containers on a particular imageID and tag
+func (c Client) GetContainersByImageID(imageID string, tag string) ([]*docker.Container, error) {
+	apiContainers, err := c.dockerClient.ListContainers(docker.ListContainersOptions{
+		All:     true,
+		Filters: map[string][]string{"ancestor": []string{fmt.Sprintf("%s:%s", imageID, tag)}},
+	})
+	if err != nil {
+		return []*docker.Container{}, err
+	}
+
+	containers := []*docker.Container{}
+	for _, apiContainer := range apiContainers {
+		container, err := c.GetContainer(apiContainer.ID)
+		if err != nil {
+			return []*docker.Container{}, err
+		}
+
+		containers = append(containers, container)
+	}
+
+	return containers, nil
 }
