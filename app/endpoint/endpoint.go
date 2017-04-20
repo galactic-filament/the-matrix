@@ -104,5 +104,7 @@ func (e Endpoint) Clean() error {
 		return err
 	}
 
+	fmt.Printf("Cleaned endpoint container %s\n", e.Container.Name)
+
 	return nil
 }
