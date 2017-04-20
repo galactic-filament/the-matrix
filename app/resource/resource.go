@@ -37,12 +37,12 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	}
 
 	// creating an endpoint container
-	containerID, err := util.GetPrefixedUUID(getContainerName(r.name))
+	containerName, err := util.GetPrefixedUUID(getContainerName(r.name))
 	if err != nil {
 		return Resource{}, err
 	}
 	container, err := client.CreateContainer(simpledocker.CreateContainerOptions{
-		Name:    containerID,
+		Name:    containerName,
 		Image:   imageID,
 		Network: opts.Network,
 	})
