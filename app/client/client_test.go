@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Sirupsen/logrus"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/endpoint"
 	"github.com/ihsw/the-matrix/app/repo"
@@ -21,6 +22,7 @@ func TestRun(t *testing.T) {
 	client := simpledocker.NewClient(dockerClient)
 
 	// creating the endpoint network
+	logrus.Info("Creating test network")
 	clientNetwork, err := simpledocker.CreateTestNetwork(client, simpledocker.DefaultTestNetworkName, simpledocker.DefaultTestNetworkDriver)
 	if err != nil {
 		t.Errorf("Could not create network: %s", err.Error())
@@ -29,6 +31,7 @@ func TestRun(t *testing.T) {
 	defer simpledocker.CleanupNetwork(t, client, clientNetwork)
 
 	// creating the endpoint resource
+	logrus.Info("Creating test resource")
 	endpointResource, err := resource.CreateTestResource(resource.CreateTestResourceOpts{
 		Client:        client,
 		Network:       clientNetwork,
@@ -43,6 +46,7 @@ func TestRun(t *testing.T) {
 	defer resource.CleanResource(t, endpointResource)
 
 	// creating the endpoint
+	logrus.Info("Creating test endpoint")
 	clientEndpoint, err := endpoint.CreateTestEndpoint(endpoint.CreateTestEndpointOpts{
 		Client:   client,
 		RepoName: repo.DefaultTestRepoName,
@@ -56,6 +60,7 @@ func TestRun(t *testing.T) {
 	defer endpoint.CleanEndpoint(t, clientEndpoint)
 
 	// creating a client
+	logrus.Info("Creating a test client")
 	clientRepo, err := repo.NewRepo(DefaultTestClientName, client)
 	if err != nil {
 		t.Errorf("Could not create repo: %s", err.Error())
@@ -64,6 +69,7 @@ func TestRun(t *testing.T) {
 	c := NewClient(clientRepo, clientNetwork)
 
 	// running it against the endpoint
+	logrus.Info("Running it against the endpoint")
 	clientContainer, err := c.Run(clientEndpoint)
 	if err != nil && err != ErrClientFailed {
 		t.Errorf("Could not run endpoint against client: %s", err.Error())
@@ -71,6 +77,7 @@ func TestRun(t *testing.T) {
 	}
 	defer CleanClient(t, c, clientContainer)
 
+	logrus.Info("Checking for failure")
 	if err == ErrClientFailed {
 		containerOutput, err := c.Client.GetContainerLogs(clientContainer)
 		if err != nil {
