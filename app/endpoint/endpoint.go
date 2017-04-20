@@ -13,13 +13,8 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
-func getContainerName(name string) (string, error) {
-	name, err := util.GetPrefixedUUID(fmt.Sprintf("%s-endpoint", name))
-	if err != nil {
-		return "", err
-	}
-
-	return name, nil
+func getContainerName(name string) string {
+	return fmt.Sprintf("%s-endpoint", name)
 }
 
 // NewEndpoint - creates a new endpoint for a client to consume
@@ -41,10 +36,7 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 	}
 
 	// creating an endpoint container
-	containerName, err := getContainerName(e.Name)
-	if err != nil {
-		return Endpoint{}, err
-	}
+	containerName := getContainerName(e.Name)
 	container, err := endpointRepo.Client.CreateContainer(simpledocker.CreateContainerOptions{
 		Name:    containerName,
 		Image:   repo.GetImageName(e.Name),
