@@ -46,7 +46,11 @@ func TestNonexistentNewRepo(t *testing.T) {
 		}
 		logrus.WithFields(logrus.Fields{"containers": len(containers), "image": imageName}).Info("Containers found with image")
 		for _, container := range containers {
-			logrus.WithFields(logrus.Fields{"container": container.Name}).Info("Container found")
+			logrus.WithFields(logrus.Fields{
+				"container": container.Name,
+				"status":    container.State.Status,
+				"running":   container.State.Running,
+			}).Info("Container found")
 		}
 
 		if err := client.RemoveImage(imageName); err != nil {
