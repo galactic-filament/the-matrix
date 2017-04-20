@@ -10,7 +10,7 @@ import (
 )
 
 // PostDockerActionDelayInSeconds - after every docker action we must sleep to wait for docker's caches to flush
-const PostDockerActionDelayInSeconds = 5
+const PostDockerActionDelayInSeconds = 0
 
 // GetPrefixedUUID - returns a prefixed uuid
 func GetPrefixedUUID(prefix string) (string, error) {
