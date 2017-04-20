@@ -6,7 +6,6 @@ import (
 
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/resource"
@@ -56,7 +55,6 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 		return Endpoint{}, err
 	}
 	e.Container = container
-	logrus.WithFields(logrus.Fields{"container": e.Container.Name}).Info("Created endpoint")
 
 	// starting it up
 	if err := e.Client.StartContainer(container, []string{}); err != nil {
@@ -104,8 +102,6 @@ func (e Endpoint) Clean() error {
 	if err := e.Client.RemoveContainer(e.Container); err != nil {
 		return err
 	}
-
-	logrus.WithFields(logrus.Fields{"container": e.Container.Name}).Info("Cleaned endpoint container")
 
 	return nil
 }
