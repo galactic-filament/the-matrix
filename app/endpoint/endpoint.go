@@ -71,7 +71,7 @@ func NewEndpoint(endpointRepo repo.Repo, network *docker.Network, resources reso
 	}
 
 	// sleeping to ensure this endpoint finishes booting up
-	time.Sleep(5 * time.Second)
+	time.Sleep(util.PostDockerActionDelayInSeconds * time.Second)
 
 	return e, nil
 }

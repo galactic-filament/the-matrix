@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ihsw/the-matrix/app/simpledocker"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 const defaultRepoImageTag = "latest"
@@ -18,21 +19,23 @@ func NewRepo(name string, client simpledocker.Client) (Repo, error) {
 	r := Repo{name, client}
 	imageName := GetImageName(r.Name)
 
+	// optionally halting on the image already existing
 	hasImage, err := client.HasImage(imageName)
 	if err != nil {
 		return Repo{}, err
 	}
-
 	if hasImage {
 		return r, nil
 	}
 
+	// pulling the image down
 	err = client.PullImage(imageName, defaultRepoImageTag)
 	if err != nil {
 		return Repo{}, err
 	}
 
-	time.Sleep(5 * time.Second)
+	// sleeping to ensure the image is accessible
+	time.Sleep(util.PostDockerActionDelayInSeconds * time.Second)
 
 	return r, nil
 }

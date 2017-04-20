@@ -11,6 +11,7 @@ import (
 	"github.com/ihsw/the-matrix/app/endpoint"
 	"github.com/ihsw/the-matrix/app/repo"
 	"github.com/ihsw/the-matrix/app/simpledocker"
+	"github.com/ihsw/the-matrix/app/util"
 )
 
 func getContainerName(clientEndpoint endpoint.Endpoint, name string) string {
@@ -74,7 +75,7 @@ func (c Client) Run(clientEndpoint endpoint.Endpoint) (*docker.Container, error)
 		}
 
 		// sleeping to ensure the container is removed and flushed out
-		time.Sleep(5 * time.Second)
+		time.Sleep(util.PostDockerActionDelayInSeconds * time.Second)
 
 		// creating a new client container
 		container, err = c.Client.CreateContainer(createContainerOpts)

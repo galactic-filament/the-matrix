@@ -9,6 +9,9 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 )
 
+// PostDockerActionDelayInSeconds - after every docker action we must sleep to wait for docker's caches to flush
+const PostDockerActionDelayInSeconds = 5
+
 // GetPrefixedUUID - returns a prefixed uuid
 func GetPrefixedUUID(prefix string) (string, error) {
 	u4, err := uuid.NewV4()
