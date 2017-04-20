@@ -3,6 +3,8 @@ package repo
 import (
 	"testing"
 
+	"fmt"
+
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
@@ -37,6 +39,14 @@ func TestNonexistentNewRepo(t *testing.T) {
 
 	if hasImage {
 		t.Logf("Removing image %s to be pulled by newRepo()", imageName)
+
+		containers, err := client.GetContainersByImageID(imageName, defaultRepoImageTag)
+		if err != nil {
+			t.Errorf("Could not get containers for this image: %s", err.Error())
+			return
+		}
+		fmt.Printf("%d containers exist on image %s, going to fail hard!", len(containers), imageName)
+
 		if err := client.RemoveImage(imageName); err != nil {
 			t.Errorf("Could not remove default repo image %s :%s", imageName, err.Error())
 			return
