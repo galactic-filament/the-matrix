@@ -3,8 +3,7 @@ package repo
 import (
 	"testing"
 
-	"fmt"
-
+	"github.com/Sirupsen/logrus"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/ihsw/the-matrix/app/simpledocker"
 )
@@ -45,9 +44,9 @@ func TestNonexistentNewRepo(t *testing.T) {
 			t.Errorf("Could not get containers for this image: %s", err.Error())
 			return
 		}
-		fmt.Printf("%d containers exist on image %s, going to fail hard!\n", len(containers), imageName)
+		logrus.WithFields(logrus.Fields{"containers": len(containers), "image": imageName}).Info("Containers found with image")
 		for _, container := range containers {
-			fmt.Printf("Container %s found\n", container.Name)
+			logrus.WithFields(logrus.Fields{"container": container.Name}).Info("Container found")
 		}
 
 		if err := client.RemoveImage(imageName); err != nil {
