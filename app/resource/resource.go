@@ -12,8 +12,15 @@ import (
 	"github.com/ihsw/the-matrix/app/util"
 )
 
-func getContainerName(name string) string { return fmt.Sprintf("%s-resource", name) }
-func getImageName(name string) string     { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
+func getContainerName(name string) (string, error) {
+	name, err := util.GetPrefixedUUID(fmt.Sprintf("%s-resource", name))
+	if err != nil {
+		return "", err
+	}
+
+	return name, nil
+}
+func getImageName(name string) string { return fmt.Sprintf("ihsw/the-matrix-%s", name) }
 
 // NewResource - creates a new resource based on a dockerfile, optionally building it where it does not exist
 func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
@@ -37,7 +44,7 @@ func NewResource(client simpledocker.Client, opts Opts) (Resource, error) {
 	}
 
 	// creating an endpoint container
-	containerName, err := util.GetPrefixedUUID(getContainerName(r.name))
+	containerName, err := getContainerName(r.name)
 	if err != nil {
 		return Resource{}, err
 	}
