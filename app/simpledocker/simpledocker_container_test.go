@@ -185,6 +185,7 @@ func TestIsStillRunning(t *testing.T) {
 		return
 	}
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultDbImage)
 		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull image %s: %s", defaultDbImage, err.Error())
 			return
