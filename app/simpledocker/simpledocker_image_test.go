@@ -49,6 +49,7 @@ func TestPullImage(t *testing.T) {
 	}
 	client := NewClient(dockerClient)
 
+	fmt.Printf("Pulling image %s\n", defaultTestImage)
 	if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 		t.Errorf("Could not pull test image %s: %s", defaultTestImage, err.Error())
 	}
@@ -70,6 +71,7 @@ func TestRemoveImage(t *testing.T) {
 	}
 
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultTestImage)
 		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull default test image %s with tag %s: %s", defaultTestImage, defaultTestImageTag, err.Error())
 			return

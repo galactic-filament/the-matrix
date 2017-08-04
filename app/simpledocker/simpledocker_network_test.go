@@ -1,6 +1,7 @@
 package simpledocker
 
 import (
+	"fmt"
 	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
@@ -44,6 +45,7 @@ func TestConnect(t *testing.T) {
 		return
 	}
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultDbImage)
 		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull image: %s", err.Error())
 			return
@@ -103,6 +105,7 @@ func TestCreateContainerWithNetwork(t *testing.T) {
 		return
 	}
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultDbImage)
 		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull image: %s", err.Error())
 			return
@@ -162,6 +165,7 @@ func TestGetContainerIP(t *testing.T) {
 		return
 	}
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultDbImage)
 		if err := client.PullImage(defaultDbImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull image: %s", err.Error())
 			return
