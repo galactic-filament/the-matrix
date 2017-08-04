@@ -24,6 +24,7 @@ func createTestContainer(client Client, namePrefix string, imageName string, net
 	}
 
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", imageName)
 		if err := client.PullImage(imageName, defaultTestImageTag); err != nil {
 			return "", nil, err
 		}
@@ -126,6 +127,7 @@ func TestIsNotRunning(t *testing.T) {
 		return
 	}
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultTestImage)
 		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull image %s: %s", defaultTestImage, err.Error())
 			return
@@ -306,6 +308,7 @@ func TestGetContainersByImageID(t *testing.T) { // creating a simpledocker clien
 		return
 	}
 	if !hasImage {
+		fmt.Printf("Pulling image %s\n", defaultTestImage)
 		if err := client.PullImage(defaultTestImage, defaultTestImageTag); err != nil {
 			t.Errorf("Could not pull image: %s", err.Error())
 			return
