@@ -8,7 +8,7 @@ import (
 	"time"
 
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/util"
+	"github.com/galactic-filament/the-matrix/app/util"
 )
 
 // CreateContainer - creates a container but doesn't start it up

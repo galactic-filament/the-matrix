@@ -1,8 +1,8 @@
 package repo
 
 import (
-	"github.com/ihsw/the-matrix/app/simpledocker"
-	"github.com/ihsw/the-matrix/app/util"
+	"github.com/galactic-filament/the-matrix/app/simpledocker"
+	"github.com/galactic-filament/the-matrix/app/util"
 )
 
 // DefaultTestRepoName - common repo name across all repo-related tests

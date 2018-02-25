@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/util"
+	"github.com/galactic-filament/the-matrix/app/util"
 )
 
 const defaultTestImageOutput = "hello world\n"

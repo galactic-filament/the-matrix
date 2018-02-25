@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/simpledocker"
-	"github.com/ihsw/the-matrix/app/util"
+	"github.com/galactic-filament/the-matrix/app/simpledocker"
+	"github.com/galactic-filament/the-matrix/app/util"
 )
 
 func getContainerName(name string) (string, error) {

@@ -5,8 +5,8 @@ import (
 
 	"time"
 
-	"github.com/ihsw/the-matrix/app/simpledocker"
-	"github.com/ihsw/the-matrix/app/util"
+	"github.com/galactic-filament/the-matrix/app/simpledocker"
+	"github.com/galactic-filament/the-matrix/app/util"
 )
 
 const defaultRepoImageTag = "latest"

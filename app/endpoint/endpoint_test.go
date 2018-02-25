@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/repo"
-	"github.com/ihsw/the-matrix/app/resource"
-	"github.com/ihsw/the-matrix/app/simpledocker"
+	"github.com/galactic-filament/the-matrix/app/repo"
+	"github.com/galactic-filament/the-matrix/app/resource"
+	"github.com/galactic-filament/the-matrix/app/simpledocker"
 )
 
 func TestNewEndpoint(t *testing.T) {

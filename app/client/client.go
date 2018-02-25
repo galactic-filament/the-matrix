@@ -8,10 +8,10 @@ import (
 	"fmt"
 
 	docker "github.com/fsouza/go-dockerclient"
-	"github.com/ihsw/the-matrix/app/endpoint"
-	"github.com/ihsw/the-matrix/app/repo"
-	"github.com/ihsw/the-matrix/app/simpledocker"
-	"github.com/ihsw/the-matrix/app/util"
+	"github.com/galactic-filament/the-matrix/app/endpoint"
+	"github.com/galactic-filament/the-matrix/app/repo"
+	"github.com/galactic-filament/the-matrix/app/simpledocker"
+	"github.com/galactic-filament/the-matrix/app/util"
 )
 
 func getContainerName(clientEndpoint endpoint.Endpoint, name string) string {

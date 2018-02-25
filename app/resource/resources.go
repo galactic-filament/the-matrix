@@ -1,6 +1,6 @@
 package resource
 
-import "github.com/ihsw/the-matrix/app/simpledocker"
+import "github.com/galactic-filament/the-matrix/app/simpledocker"
 
 // NewResources - generates a new list of resources
 func NewResources(client simpledocker.Client, optList []Opts) (Resources, error) {
