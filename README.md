@@ -1,6 +1,7 @@
 # the-matrix
 
 [![Build Status](https://travis-ci.org/galactic-filament/the-matrix.svg?branch=master)](https://travis-ci.org/galactic-filament/the-matrix)
+[![Coverage Status](https://coveralls.io/repos/github/galactic-filament/the-matrix/badge.svg?branch=master)](https://coveralls.io/github/galactic-filament/the-matrix?branch=master)
 
 ## What it represents
 
