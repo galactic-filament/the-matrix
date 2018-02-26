@@ -6,7 +6,7 @@ import (
 )
 
 // DefaultTestRepoName - common repo name across all repo-related tests
-const DefaultTestRepoName = "es-bueno"
+const DefaultTestRepoName = "go-home"
 
 type repoTask struct {
 	repo Repo
